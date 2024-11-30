@@ -1,2 +1,2 @@
 from django.contrib import admin
-from .models import YourModelName
+from craftify.models.user_ext_controller import UserExtended
