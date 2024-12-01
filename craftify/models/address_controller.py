@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
 class Address(models.Model):
+    
     street = models.CharField(
         max_length=255,
         null=True,
