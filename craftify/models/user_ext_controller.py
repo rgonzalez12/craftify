@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
-from address.models import AddressField
+from address.fields import AddressField
 
 class UserExtended(AbstractUser):
     
