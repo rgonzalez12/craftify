@@ -1,19 +1,43 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
-from address.models import AddressField
+from address.models import Address, Country
 
 class UserExtended(AbstractUser):
-    date_of_birth = models.DateField(auto_now=False, auto_now_add=False)
+    
+    date_of_birth = models.DateField(
+        null=False, 
+        blank=False, 
+        auto_now=False, 
+        auto_now_add=False, 
+        help_text="Enter your date of birth."
+    )
+
+    drivers_license_number = models.CharField(
+        max_length=16,
+        validators=[
+           RegexValidator(
+               regex=r'^[A-Za-z0-9]{6,16}$',
+               message="Driver's license must be 6–16 alphanumeric characters.",
+               code='INVALID_ID_NUMBER'
+           ) 
+        ],
+        help_text="Enter a valid driver's license number (6–16 characters).",
+        null=False, 
+        blank=False
+    )
+
     address = AddressField(on_delete=models.CASCADE)
+
     phone_number = models.BigIntegerField(
         validators=[
             MinValueValidator(10**14),
             MaxValueValidator(10**15 - 1)
         ],
-        null=True,
-        blank=True
+        null=False,
+        blank=False
     )
+
     country_code = models.CharField(
         max_length=4,
         validators=[
@@ -23,9 +47,10 @@ class UserExtended(AbstractUser):
                 code='INVALID_PHONE_NUMBER'
             )
         ],
-        null=True,
-        blank=True
+        null=False,
+        blank=False
     )
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='userextended_set',  # Avoid reverse accessor conflict
@@ -33,6 +58,7 @@ class UserExtended(AbstractUser):
         help_text='The groups this user belongs to.',
         verbose_name='groups',
     )
+
     user_permissions = models.ManyToManyField(
         'auth.Permission',
         related_name='userextended_set',  # Avoid reverse accessor conflict
@@ -45,5 +71,5 @@ class UserExtended(AbstractUser):
         verbose_name = "Extended User Model"
         verbose_name_plural = "Extended User Models"
 
-
+# supertestuser is the test-build admin user
 
