@@ -1,19 +1,22 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
-from address.fields import AddressField
+from .address_controller import Address 
 
 class UserExtended(AbstractUser):
 
-    address = AddressField(
-        on_delete=models.CASCADE, 
-        null=True, 
-        blank=True
+    address = models.OneToOneField(
+        Address,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,  
+        help_text="User's address"
     )
 
     bio = models.TextField(
         null=True, 
-        blank=True
+        blank=True,
+        help_text="User Bio"
     )
 
     country_code = models.CharField(
@@ -24,7 +27,8 @@ class UserExtended(AbstractUser):
             code='INVALID_PHONE_NUMBER'
         )],
         null=False,
-        blank=False
+        blank=False,
+        help_text="Country Code for Phone Numbers"
     )
 
     date_of_birth = models.DateField(
@@ -57,7 +61,8 @@ class UserExtended(AbstractUser):
         max_length=15,
         validators=[RegexValidator(regex=r'^\+?\d{10,15}$', message="Enter a valid phone number.")],
         null=False,
-        blank=False
+        blank=False,
+        help_text="Enter your phone number."
     )
 
     user_permissions = models.ManyToManyField(
