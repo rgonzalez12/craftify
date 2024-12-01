@@ -1,13 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
+from address.models import AddressField
 
 class UserExtended(AbstractUser):
+    date_of_birth = models.DateField(auto_now=False, auto_now_add=False)
+    address = AddressField(on_delete=models.CASCADE)
     phone_number = models.BigIntegerField(
         validators=[
             MinValueValidator(10**14),
             MaxValueValidator(10**15 - 1)
-        ]
+        ],
+        null=True,
+        blank=True
     )
     country_code = models.CharField(
         max_length=4,
@@ -17,7 +22,9 @@ class UserExtended(AbstractUser):
                 message="The Country Code must start with a '+' and be followed by up to 3 digits.",
                 code='INVALID_PHONE_NUMBER'
             )
-        ]
+        ],
+        null=True,
+        blank=True
     )
     groups = models.ManyToManyField(
         'auth.Group',
@@ -35,7 +42,8 @@ class UserExtended(AbstractUser):
     )
 
     class Meta:
-        verbose_name = "Extended User"
-        verbose_name_plural = "Extended Users"      
+        verbose_name = "Extended User Model"
+        verbose_name_plural = "Extended User Models"
+
 
 
