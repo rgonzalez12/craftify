@@ -1,52 +1,44 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
-from address.models import Address, Country
+from addresses.models import Address
 
 class UserExtended(AbstractUser):
     
     date_of_birth = models.DateField(
         null=False, 
         blank=False, 
-        auto_now=False, 
-        auto_now_add=False, 
         help_text="Enter your date of birth."
     )
 
     drivers_license_number = models.CharField(
         max_length=16,
-        validators=[
-           RegexValidator(
-               regex=r'^[A-Za-z0-9]{6,16}$',
-               message="Driver's license must be 6–16 alphanumeric characters.",
-               code='INVALID_ID_NUMBER'
-           ) 
-        ],
+        validators=[RegexValidator(
+            regex=r'^[A-Za-z0-9]{6,16}$',
+            message="Driver's license must be 6–16 alphanumeric characters.",
+            code='INVALID_ID_NUMBER'
+        )],
         help_text="Enter a valid driver's license number (6–16 characters).",
         null=False, 
         blank=False
     )
 
-    address = AddressField(on_delete=models.CASCADE)
+    address = AddressField(on_delete=models.CASCADE, null=True, blank=True)
 
-    phone_number = models.BigIntegerField(
-        validators=[
-            MinValueValidator(10**14),
-            MaxValueValidator(10**15 - 1)
-        ],
+    phone_number = models.CharField(
+        max_length=15,
+        validators=[RegexValidator(regex=r'^\+?\d{10,15}$', message="Enter a valid phone number.")],
         null=False,
         blank=False
     )
 
     country_code = models.CharField(
         max_length=4,
-        validators=[
-            RegexValidator(
-                regex=r'^\+\d{0,3}$',
-                message="The Country Code must start with a '+' and be followed by up to 3 digits.",
-                code='INVALID_PHONE_NUMBER'
-            )
-        ],
+        validators=[RegexValidator(
+            regex=r'^\+\d{1,3}$',  # Enforce 1 to 3 digits after '+'
+            message="The country code must start with a '+' and be followed by up to 3 digits.",
+            code='INVALID_PHONE_NUMBER'
+        )],
         null=False,
         blank=False
     )
