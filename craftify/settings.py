@@ -38,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sessions',
     'pillow',
+    'djangorestframework',
     'craftify'
 ]
 
 AUTH_USER_MODEL = 'craftify.UserExtended'
+
+MEDIA_URL = '/media/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
