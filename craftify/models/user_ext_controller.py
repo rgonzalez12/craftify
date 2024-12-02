@@ -19,12 +19,11 @@ class UserExtendedManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('date_of_birth', '1970-01-01')  # Default date of birth
-        extra_fields.setdefault('country_code', '+1')  # Default country code
-        extra_fields.setdefault('drivers_license_number', 'DEFAULT123456')  # Default driver's license number
-        extra_fields.setdefault('phone_number', '+1234567890')  # Default phone number
+        extra_fields.setdefault('date_of_birth', '1970-01-01')
+        extra_fields.setdefault('country_code', '+1')
+        extra_fields.setdefault('drivers_license_number', 'DEFAULT123456')
+        extra_fields.setdefault('phone_number', '+1234567890')
 
-        # Ensure default address exists
         try:
             default_address = Address.objects.get(id=1)
         except ObjectDoesNotExist:
@@ -42,7 +41,7 @@ class UserExtendedManager(BaseUserManager):
         if not extra_fields.get('is_superuser'):
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(email, password, **extra_fields)  
+        return self.create_user(email, password, **extra_fields)
 
 class UserExtended(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
@@ -50,35 +49,25 @@ class UserExtended(AbstractBaseUser, PermissionsMixin):
     address = models.OneToOneField(
         Address,
         on_delete=models.CASCADE,
-        null=False,
-        blank=False,
         help_text="User's address"
     )
-
     bio = models.TextField(
         null=True,
         blank=True,
         help_text="User Bio"
     )
-
     country_code = models.CharField(
         max_length=4,
         validators=[RegexValidator(
-            regex=r'^\+\d{1,3}$',  # Enforce 1 to 3 digits after '+'
+            regex=r'^\+\d{1,3}$',
             message="The country code must start with a '+' and be followed by up to 3 digits.",
             code='INVALID_PHONE_NUMBER'
         )],
-        null=False,
-        blank=False,
         help_text="Country Code for Phone Numbers"
     )
-
     date_of_birth = models.DateField(
-        null=False,
-        blank=False,
         help_text="Enter your date of birth."
     )
-
     drivers_license_number = models.CharField(
         max_length=16,
         validators=[RegexValidator(
@@ -86,38 +75,30 @@ class UserExtended(AbstractBaseUser, PermissionsMixin):
             message="Driver's license must be 6–16 alphanumeric characters.",
             code='INVALID_ID_NUMBER'
         )],
-        help_text="Enter a valid driver's license number (6–16 characters).",
-        null=False,
-        blank=False
+        help_text="Enter a valid driver's license number (6–16 characters)."
     )
-
     groups = models.ManyToManyField(
         'auth.Group',
-        related_name='userextended_set',  
+        related_name='userextended_set',
         blank=True,
         help_text='The groups this user belongs to.',
         verbose_name='groups',
     )
-
     phone_number = models.CharField(
         max_length=15,
         validators=[RegexValidator(
             regex=r'^\+?\d{10,15}$',
             message="Enter a valid phone number."
         )],
-        null=False,
-        blank=False,
         help_text="Enter your phone number."
     )
-
     user_permissions = models.ManyToManyField(
         'auth.Permission',
-        related_name='userextended_set',  
+        related_name='userextended_set',
         blank=True,
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
     )
-
     first_name = models.CharField(max_length=30, blank=True, null=True)
     last_name = models.CharField(max_length=150, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
