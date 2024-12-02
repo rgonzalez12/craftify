@@ -91,11 +91,6 @@ class Item(models.Model):
     def __str__(self):
         return f'{self.name} by {self.owner.username}'
 
-    def clean(self):
-        super().clean()
-        if self.price > 1000000:
-            raise ValidationError("Price cannot exceed $1,000,000.")
-      
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
