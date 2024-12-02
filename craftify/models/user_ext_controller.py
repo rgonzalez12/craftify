@@ -1,18 +1,18 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.core.validators import RegexValidator  # Corrected import
+from django.core.validators import RegexValidator
 from django.contrib.auth.base_user import BaseUserManager
 from .address_controller import Address
 
 class UserExtendedManager(BaseUserManager):
-    # Define methods for creating user and superuser
+    
     def create_user(self, email, password=None, **extra_fields):
-        # Implement user creation logic here
-        pass  # Added pass statement
+        
+        pass
 
     def create_superuser(self, email, password=None, **extra_fields):
-        # Implement superuser creation logic here
-        pass  # Added pass statement
+        
+        pass  
 
 class UserExtended(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
@@ -63,7 +63,7 @@ class UserExtended(AbstractBaseUser, PermissionsMixin):
 
     groups = models.ManyToManyField(
         'auth.Group',
-        related_name='userextended_set',  # Avoid reverse accessor conflict
+        related_name='userextended_set',  
         blank=True,
         help_text='The groups this user belongs to.',
         verbose_name='groups',
@@ -82,7 +82,7 @@ class UserExtended(AbstractBaseUser, PermissionsMixin):
 
     user_permissions = models.ManyToManyField(
         'auth.Permission',
-        related_name='userextended_set',  # Avoid reverse accessor conflict
+        related_name='userextended_set',  
         blank=True,
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
