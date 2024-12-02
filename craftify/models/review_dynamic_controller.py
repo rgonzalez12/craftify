@@ -76,11 +76,8 @@ class Review(models.Model):
         super().clean()
         if self.user == self.reviewee:
             raise ValidationError("You cannot review yourself.")
-        if not self.content_object:
-            raise ValidationError("The content object does not exist.")
-        if hasattr(self.content_object, 'owner'):
-            if self.reviewee != self.content_object.owner:
-                raise ValidationError("The reviewee must be the owner of the content object.")
+        if hasattr(self.content_object, 'owner') and self.reviewee != self.content_object.owner:
+            raise ValidationError("The reviewee must be the owner of the content object.")
 
     def save(self, *args, **kwargs):
         self.full_clean()
