@@ -1,9 +1,22 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator  # Corrected import
+from django.contrib.auth.base_user import BaseUserManager
 from .address_controller import Address
 
-class UserExtended(AbstractUser):
+class UserExtendedManager(BaseUserManager):
+    # Define methods for creating user and superuser
+    def create_user(self, email, password=None, **extra_fields):
+        # Implement user creation logic here
+        pass  # Added pass statement
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        # Implement superuser creation logic here
+        pass  # Added pass statement
+
+class UserExtended(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, unique=True)
     address = models.OneToOneField(
         Address,
         on_delete=models.CASCADE,
@@ -74,6 +87,16 @@ class UserExtended(AbstractUser):
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
     )
+
+    first_name = models.CharField(max_length=30, blank=True, null=True)
+    last_name = models.CharField(max_length=150, blank=True, null=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    objects = UserExtendedManager()
 
     class Meta:
         verbose_name = "Extended User Model"

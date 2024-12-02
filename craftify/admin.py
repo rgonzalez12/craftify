@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
-from .models import UserExtended, Review, Item
+from .models.user_ext_controller import UserExtended
+from .models import Review, Item
 
 admin.site.unregister(Group)
 

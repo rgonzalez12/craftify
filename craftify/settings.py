@@ -31,15 +31,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'craftify',  # Move your app here
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sessions',
-    'pillow',
-    'djangorestframework',
-    'craftify'
+    'rest_framework',  # Correct name for Django REST framework
 ]
 
 AUTH_USER_MODEL = 'craftify.UserExtended'
