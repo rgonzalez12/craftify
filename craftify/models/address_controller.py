@@ -30,7 +30,7 @@ class Address(models.Model):
         null=False,
         blank=False,
         validators=[RegexValidator(
-            regex=r'^\d{5}(-\d{4})?$',  # Simple U.S. postal code validation (5 digits or 5+4 digits)
+            regex=r'^\d{5}(-\d{4})?$',
             message="Enter a valid postal code (e.g., 62701 or 62701-1234)."
         )],
         help_text="Enter your postal code"
