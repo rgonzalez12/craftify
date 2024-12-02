@@ -9,6 +9,8 @@ from django.core.validators import (
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 User = get_user_model()
 
@@ -29,11 +31,13 @@ class Item(models.Model):
         ]
     )
     description = models.TextField(
-        help_text="Description of the item"
+        help_text="Description of the item",
+        default='No description provided.'
     )
     category = models.CharField(
         max_length=100,
-        help_text="Category of the item"
+        help_text="Category of the item",
+        default='Uncategorized'
     )
     image = models.ImageField(
         upload_to='item_images/',
@@ -88,8 +92,25 @@ class PurchaseOrderItem(models.Model):
     quantity = models.IntegerField(default=1)
 
 class Review(models.Model):
-    purchase_order_item = models.ForeignKey(PurchaseOrderItem, on_delete=models.CASCADE)
-    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews_made',
+        help_text="User who wrote the review"
+    )
+    reviewee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews_received',
+        help_text="User who is being reviewed"
+    )
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        help_text="Content type of the object being reviewed"
+    )
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
     rating = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(1),
@@ -100,7 +121,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"Review by {self.reviewer} on {self.purchase_order_item.item.name}"
+        return f"Review by {self.user} on {self.content_object}"
 
 class ReturnOrder(models.Model):
     purchase_order = models.ForeignKey(PurchaseOrder, related_name='returns', on_delete=models.CASCADE)
