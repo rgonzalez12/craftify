@@ -37,8 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sessions',
+    'pillow',
     'craftify'
 ]
+
+AUTH_USER_MODEL = 'craftify.UserExtended'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

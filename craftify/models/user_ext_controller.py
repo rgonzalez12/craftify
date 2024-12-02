@@ -1,20 +1,19 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
-from .address_controller import Address 
+from django.core.validators import RegexValidator
+from .address_controller import Address
 
 class UserExtended(AbstractUser):
-
     address = models.OneToOneField(
         Address,
         on_delete=models.CASCADE,
         null=False,
-        blank=False,  
+        blank=False,
         help_text="User's address"
     )
 
     bio = models.TextField(
-        null=True, 
+        null=True,
         blank=True,
         help_text="User Bio"
     )
@@ -32,8 +31,8 @@ class UserExtended(AbstractUser):
     )
 
     date_of_birth = models.DateField(
-        null=False, 
-        blank=False, 
+        null=False,
+        blank=False,
         help_text="Enter your date of birth."
     )
 
@@ -45,7 +44,7 @@ class UserExtended(AbstractUser):
             code='INVALID_ID_NUMBER'
         )],
         help_text="Enter a valid driver's license number (6–16 characters).",
-        null=False, 
+        null=False,
         blank=False
     )
 
@@ -59,7 +58,10 @@ class UserExtended(AbstractUser):
 
     phone_number = models.CharField(
         max_length=15,
-        validators=[RegexValidator(regex=r'^\+?\d{10,15}$', message="Enter a valid phone number.")],
+        validators=[RegexValidator(
+            regex=r'^\+?\d{10,15}$',
+            message="Enter a valid phone number."
+        )],
         null=False,
         blank=False,
         help_text="Enter your phone number."
@@ -76,6 +78,3 @@ class UserExtended(AbstractUser):
     class Meta:
         verbose_name = "Extended User Model"
         verbose_name_plural = "Extended User Models"
-
-# supertestuser is the test-build admin user
-
