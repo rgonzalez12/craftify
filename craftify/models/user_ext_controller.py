@@ -3,16 +3,46 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.base_user import BaseUserManager
 from .address_controller import Address
+from django.core.exceptions import ObjectDoesNotExist
 
 class UserExtendedManager(BaseUserManager):
     
     def create_user(self, email, password=None, **extra_fields):
-        
-        pass
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        
-        pass  
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('date_of_birth', '1970-01-01')  # Default date of birth
+        extra_fields.setdefault('country_code', '+1')  # Default country code
+        extra_fields.setdefault('drivers_license_number', 'DEFAULT123456')  # Default driver's license number
+        extra_fields.setdefault('phone_number', '+1234567890')  # Default phone number
+
+        # Ensure default address exists
+        try:
+            default_address = Address.objects.get(id=1)
+        except ObjectDoesNotExist:
+            default_address = Address.objects.create(
+                street='Default Street',
+                city='Default City',
+                state='Default State',
+                postal_code='00000',
+                country='Default Country'
+            )
+        extra_fields.setdefault('address', default_address)
+
+        if not extra_fields.get('is_staff'):
+            raise ValueError('Superuser must have is_staff=True.')
+        if not extra_fields.get('is_superuser'):
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(email, password, **extra_fields)  
 
 class UserExtended(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)

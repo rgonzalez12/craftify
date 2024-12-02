@@ -8,7 +8,6 @@ admin.site.unregister(Group)
 
 @admin.register(UserExtended)
 class UserExtendedAdmin(BaseUserAdmin):
-   
     fieldsets = BaseUserAdmin.fieldsets + (
         ('Additional Info', {
             'fields': (
@@ -18,6 +17,8 @@ class UserExtendedAdmin(BaseUserAdmin):
                 'phone_number',
                 'country_code',
                 'address',
+                'profile_picture',
+                'website',
             ),
         }),
     )
@@ -31,13 +32,14 @@ class UserExtendedAdmin(BaseUserAdmin):
                 'phone_number',
                 'country_code',
                 'address',
+                'profile_picture',
+                'website',
             ),
         }),
     )
 
-    list_display = BaseUserAdmin.list_display + ('date_of_birth',)
-
-    search_fields = BaseUserAdmin.search_fields + ('phone_number', 'drivers_license_number')
+    list_display = BaseUserAdmin.list_display + ('date_of_birth', 'phone_number')
+    search_fields = BaseUserAdmin.search_fields + ('phone_number', 'drivers_license_number', 'address')
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
