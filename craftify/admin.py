@@ -38,29 +38,8 @@ class UserExtendedAdmin(BaseUserAdmin):
         }),
     )
 
-    list_display = BaseUserAdmin.list_display + ('date_of_birth', 'phone_number')
-    search_fields = BaseUserAdmin.search_fields + ('phone_number', 'drivers_license_number', 'address')
+    list_display = ('email', 'username', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active')
 
-@admin.register(Review)
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('user', 'reviewee', 'content_object', 'rating', 'created_at')
-    list_filter = ('rating', 'created_at')
-    search_fields = ('user__username', 'reviewee__username', 'comment')
-
-@admin.register(Item)
-class ItemAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'price', 'quantity', 'created_at')
-    list_filter = ('created_at', 'price')
-    search_fields = ('name', 'owner__username')
-
-@admin.register(PurchaseOrder)
-class PurchaseOrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'seller', 'buyer', 'created_at')
-
-@admin.register(PurchaseOrderItem)
-class PurchaseOrderItemAdmin(admin.ModelAdmin):
-    list_display = ('purchase_order', 'item', 'quantity')
-
-@admin.register(ReturnOrder)
-class ReturnOrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'purchase_order', 'item', 'seller', 'buyer', 'refund_given', 'return_date', 'refund_date')
+    search_fields = ('email', 'username')
+    ordering = ('email',)
