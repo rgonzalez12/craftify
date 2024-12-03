@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login
 from craftify.forms.user_form import UserExtendedForm, UserProfileForm, UserContactForm
 
 UserExtended = get_user_model()
@@ -77,3 +77,15 @@ def delete_user(request, user_id):
         user.delete()
         return redirect('list_users')
     return render(request, 'users/delete.html', {'user': user})
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            return render(request, 'users/login.html', {'error': 'Invalid username or password'})
+    return render(request, 'users/login.html')

@@ -28,5 +28,5 @@ urlpatterns = [
     path('users/<int:user_id>/delete/', user_views.delete_user, name='delete_user'),  # Corrected line
     path('signup/', user_views.signup, name='signup'),
     path('profile/<int:user_id>/', user_views.profile, name='profile'),
+    path('login/', user_views.login_view, name='login'),  # Add this line for the login view
 ]
-
