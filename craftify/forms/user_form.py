@@ -8,3 +8,13 @@ class UserExtendedForm(forms.ModelForm):
             'email', 'username', 'bio', 'date_of_birth', 'drivers_license_number',
             'phone_number', 'country_code', 'address'
         ]
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserExtended
+        fields = ['bio', 'date_of_birth', 'profile_picture', 'website']
+
+class UserContactForm(forms.ModelForm):
+    class Meta:
+        model = UserExtended
+        fields = ['phone_number', 'country_code', 'address', 'email']
