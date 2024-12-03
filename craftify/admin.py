@@ -17,8 +17,7 @@ class UserExtendedAdmin(BaseUserAdmin):
                 'phone_number',
                 'country_code',
                 'address',
-                'profile_picture',
-                'website',
+                # Remove 'profile_picture' and 'website' if not required
             ),
         }),
     )
@@ -32,8 +31,7 @@ class UserExtendedAdmin(BaseUserAdmin):
                 'phone_number',
                 'country_code',
                 'address',
-                'profile_picture',
-                'website',
+                # Remove 'profile_picture' and 'website' if not required
             ),
         }),
     )
@@ -43,3 +41,10 @@ class UserExtendedAdmin(BaseUserAdmin):
 
     search_fields = ('email', 'username')
     ordering = ('email',)
+
+# Register other models
+admin.site.register(Review)
+admin.site.register(Item)
+admin.site.register(PurchaseOrder)
+admin.site.register(PurchaseOrderItem)
+admin.site.register(ReturnOrder)
