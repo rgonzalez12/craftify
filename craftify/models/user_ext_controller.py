@@ -99,6 +99,8 @@ class UserExtended(AbstractBaseUser, PermissionsMixin):
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
     )
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    website = models.URLField(blank=True)
     first_name = models.CharField(max_length=30, blank=True, null=True)
     last_name = models.CharField(max_length=150, blank=True, null=True)
     is_staff = models.BooleanField(default=False)

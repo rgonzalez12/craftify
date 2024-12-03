@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import get_user_model
-from .forms import UserExtendedForm
+from craftify.forms.user_form import UserExtendedForm
 
 UserExtended = get_user_model()
 
