@@ -1,5 +1,5 @@
 from django import forms
-from .models import Item
+from craftify.models.item_controller import Item
 
 class ItemForm(forms.ModelForm):
     class Meta:
