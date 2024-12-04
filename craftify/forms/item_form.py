@@ -22,7 +22,7 @@ class ItemForm(forms.ModelForm):
 class PurchaseOrderForm(forms.ModelForm):
     class Meta:
         model = PurchaseOrder
-        fields = []
+        fields = ['seller', 'buyer', 'total_amount']
         widgets = {
             'seller': forms.HiddenInput(),
             'buyer': forms.HiddenInput(),
@@ -34,7 +34,7 @@ class PurchaseOrderForm(forms.ModelForm):
         self.buyer = kwargs.pop('buyer', None)
         super().__init__(*args, **kwargs)
 
-    def save(self, commit=True): # The total_amount should be calculated based on PurchaseOrderItems Total
+    def save(self, commit=True):
         instance = super().save(commit=False)
         if self.seller:
             instance.seller = self.seller

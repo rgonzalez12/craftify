@@ -33,6 +33,9 @@ class Cart(models.Model):
     def clear_cart(self):
         self.items.all().delete()
 
+    def get_total_price(self):
+        return sum(item.get_total_price() for item in self.items.all())
+
     def process_to_purchase_order(self):
         if not self.items.exists():
             return None
@@ -60,3 +63,6 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} of {self.item.name} in cart of {self.cart.user.username}"
+    
+    def get_total_price(self):
+        return self.item.price * self.quantity

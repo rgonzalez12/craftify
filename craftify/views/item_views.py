@@ -14,6 +14,7 @@ def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     return render(request, 'items/item_detail.html', {'item': item})
 
+@login_required
 def create_item(request):
     if request.method == 'POST':
         form = ItemForm(request.POST, request.FILES)
