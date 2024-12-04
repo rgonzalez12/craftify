@@ -15,7 +15,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # Automatically log the user in after signup
-            return redirect('profile', user_id=user.id)
+            return redirect('home')  # Redirect to the home page after signup
     else:
         form = UserExtendedForm()
     return render(request, 'users/signup.html', {'form': form})
@@ -99,3 +99,5 @@ def profile(request, user_id):
         })
     else:
         return render(request, 'users/view_profile.html', {'user': user})
+    
+    
