@@ -34,13 +34,12 @@ class PurchaseOrderForm(forms.ModelForm):
         self.buyer = kwargs.pop('buyer', None)
         super().__init__(*args, **kwargs)
 
-    def save(self, commit=True):
+    def save(self, commit=True): # The total_amount should be calculated based on PurchaseOrderItems Total
         instance = super().save(commit=False)
         if self.seller:
             instance.seller = self.seller
         if self.buyer:
             instance.buyer = self.buyer
-        # The total_amount should be calculated based on PurchaseOrderItems Total
         if commit:
             instance.save()
         return instance
