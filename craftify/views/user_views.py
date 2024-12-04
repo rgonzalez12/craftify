@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth import get_user_model, authenticate, login, logout
+from django.contrib import messages
 from craftify.forms.user_form import UserExtendedForm, UserProfileForm, UserContactForm
 
 UserExtended = get_user_model()
@@ -19,14 +20,34 @@ def signup(request):
         form = UserExtendedForm()
     return render(request, 'users/signup.html', {'form': form})
 
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, 'Invalid username or password')
+    return render(request, 'users/login.html')
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return redirect('home')
+
+@login_required
 def list_users(request):
     users = UserExtended.objects.all()
     return render(request, 'users/list.html', {'users': users})
 
+@login_required
 def user_detail(request, user_id):
     user = get_object_or_404(UserExtended, pk=user_id)
     return render(request, 'users/detail.html', {'user': user})
 
+@login_required
 def create_user(request):
     if request.method == 'POST':
         form = UserExtendedForm(request.POST, request.FILES)
@@ -37,6 +58,7 @@ def create_user(request):
         form = UserExtendedForm()
     return render(request, 'users/create.html', {'form': form})
 
+@login_required
 def update_user(request, user_id):
     user = get_object_or_404(UserExtended, pk=user_id)
     if request.method == 'POST':
@@ -47,6 +69,14 @@ def update_user(request, user_id):
     else:
         form = UserExtendedForm(instance=user)
     return render(request, 'users/update.html', {'form': form})
+
+@login_required
+def delete_user(request, user_id):
+    user = get_object_or_404(UserExtended, pk=user_id)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('list_users')
+    return render(request, 'users/delete.html', {'user': user})
 
 @login_required
 def profile(request, user_id):
@@ -69,23 +99,3 @@ def profile(request, user_id):
         })
     else:
         return render(request, 'users/view_profile.html', {'user': user})
-
-@login_required
-def delete_user(request, user_id):
-    user = get_object_or_404(UserExtended, pk=user_id)
-    if request.method == 'POST':
-        user.delete()
-        return redirect('list_users')
-    return render(request, 'users/delete.html', {'user': user})
-
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-        else:
-            return render(request, 'users/login.html', {'error': 'Invalid username or password'})
-    return render(request, 'users/login.html')
