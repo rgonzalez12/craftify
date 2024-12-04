@@ -21,12 +21,13 @@ from .views import user_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', user_views.home, name='home'),  # Home view
-    path('users/', user_views.list_users, name='list_users'),
-    path('users/<int:user_id>/', user_views.user_detail, name='user_detail'),
-    path('users/create/', user_views.create_user, name='create_user'),
-    path('users/<int:user_id>/update/', user_views.update_user, name='update_user'),
-    path('users/<int:user_id>/delete/', user_views.delete_user, name='delete_user'),  # Corrected line
-    path('signup/', user_views.signup, name='signup'),
-    path('profile/<int:user_id>/', user_views.profile, name='profile'),
-    path('login/', user_views.login_view, name='login'),  # Add this line for the login view
+    path('signup/', user_views.signup, name='signup'),  # User signup
+    path('login/', user_views.user_login, name='login'),  # User login
+    path('logout/', user_views.user_logout, name='logout'),  # User logout
+    path('users/', user_views.list_users, name='list_users'),  # List all users
+    path('users/<int:user_id>/', user_views.user_detail, name='user_detail'),  # User detail
+    path('users/create/', user_views.create_user, name='create_user'),  # Create user
+    path('users/<int:user_id>/update/', user_views.update_user, name='update_user'),  # Update user
+    path('users/<int:user_id>/delete/', user_views.delete_user, name='delete_user'),  # Delete user
+    path('profile/<int:user_id>/', user_views.profile, name='profile'),  # User profile
 ]
