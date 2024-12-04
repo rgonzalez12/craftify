@@ -30,10 +30,7 @@ class UserExtendedForm(forms.ModelForm):
 
     class Meta:
         model = UserExtended
-        fields = [
-            'email', 'username', 'bio', 'date_of_birth', 'drivers_license_number',
-            'phone_number', 'country_code', 'address', 'profile_picture', 'website'
-        ]
+        fields = ['username', 'email', 'phone_number', 'bio', 'date_of_birth', 'drivers_license_number', 'country_code', 'address', 'profile_picture', 'website']
         widgets = {
             'bio': forms.Textarea(attrs={'class': 'form-textarea', 'placeholder': 'Tell us about yourself'}),
             'date_of_birth': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
@@ -46,7 +43,7 @@ class UserExtendedForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if email and UserExtended.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+        if UserExtended.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("This email address is already in use.")
         return email
 
@@ -93,7 +90,7 @@ class UserContactForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if email and UserExtended.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+        if UserExtended.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("This email address is already in use.")
         return email
 
