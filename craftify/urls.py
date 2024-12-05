@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import item_views, user_views
+from .views import item_views, user_views, cart_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +31,5 @@ urlpatterns = [
     path('users/<int:user_id>/delete/', user_views.delete_user, name='delete_user'),  # Delete user
     path('profile/<int:user_id>/', user_views.profile, name='profile'),  # User profile
     path('item/<int:item_id>/', item_views.item_detail, name='item_detail'),  # Item detail view
+    path('cart/add/<int:item_id>/', cart_views.add_to_cart, name='add_to_cart'),  # Add to cart view
 ]

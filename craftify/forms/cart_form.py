@@ -1,6 +1,5 @@
 from django import forms
-from craftify.models.cart_controller import Cart, CartItem
-from craftify.models.item_controller import Item
+from craftify.models.cart_controller import CartItem
 
 class AddToCartForm(forms.ModelForm):
     quantity = forms.IntegerField(min_value=1, initial=1, widget=forms.NumberInput(attrs={'class': 'form-input', 'min': '1'}))
@@ -27,11 +26,12 @@ class AddToCartForm(forms.ModelForm):
         return cart_item
 
 class CartUpdateForm(forms.ModelForm):
-    quantity = forms.IntegerField(min_value=1, widget=forms.NumberInput(attrs={'class': 'form-input', 'min': '1'}))
-    
     class Meta:
         model = CartItem
         fields = ['quantity']
+        widgets = {
+            'quantity': forms.NumberInput(attrs={'class': 'form-input', 'min': '1', 'step': '1'}),
+        }
 
-
-
+class CartRemoveForm(forms.Form):
+    item_id = forms.IntegerField(widget=forms.HiddenInput())
