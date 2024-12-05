@@ -16,11 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import user_views
+from .views import item_views, user_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', user_views.home, name='home'),  # Home view
+    path('', item_views.home, name='home'),  # Home view
     path('signup/', user_views.signup, name='signup'),  # User signup
     path('login/', user_views.user_login, name='login'),  # User login
     path('logout/', user_views.user_logout, name='logout'),  # User logout
@@ -30,4 +30,5 @@ urlpatterns = [
     path('users/<int:user_id>/update/', user_views.update_user, name='update_user'),  # Update user
     path('users/<int:user_id>/delete/', user_views.delete_user, name='delete_user'),  # Delete user
     path('profile/<int:user_id>/', user_views.profile, name='profile'),  # User profile
+    path('item/<int:item_id>/', item_views.item_detail, name='item_detail'),  # Item detail view
 ]

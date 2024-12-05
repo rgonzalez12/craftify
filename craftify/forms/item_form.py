@@ -4,7 +4,7 @@ from craftify.models.item_controller import Item, PurchaseOrder, PurchaseOrderIt
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['name', 'description', 'price', 'image', 'category']
+        fields = ['name', 'description', 'price', 'quantity', 'seller'] 
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter item name'}),
             'description': forms.Textarea(attrs={'class': 'form-textarea', 'placeholder': 'Enter item description'}),

@@ -6,13 +6,17 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 
+def home(request):
+    items = Item.objects.all()
+    return render(request, 'home.html', {'items': items})
+
 def list_items(request):
     items = Item.objects.all()
     return render(request, 'items/item_list.html', {'items': items})
 
 def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
-    return render(request, 'items/item_detail.html', {'item': item})
+    return render(request, 'item_detail.html', {'item': item})
 
 @login_required
 def create_item(request):

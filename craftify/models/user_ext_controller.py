@@ -18,27 +18,11 @@ class UserExtendedManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('date_of_birth', '1970-01-01')
-        extra_fields.setdefault('country_code', '+1')
-        extra_fields.setdefault('drivers_license_number', 'DEFAULT123456')
-        extra_fields.setdefault('phone_number', '+1234567890')
-
-        # Create a unique address using timestamp
-        timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
-        default_address = Address.objects.create(
-            street=f'Default Street {timestamp}',
-            city='Default City',
-            state='Default State',
-            postal_code='00000',
-            country='Default Country'
-        )
-        extra_fields['address'] = default_address
-
         return self.create_user(email, password, **extra_fields)
 
 class UserExtended(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=150, unique=True)
+    username = models.CharField(max_length=255, unique=True)
     address = models.OneToOneField(
         Address,
         on_delete=models.CASCADE,
@@ -48,7 +32,7 @@ class UserExtended(AbstractBaseUser, PermissionsMixin):
     bio = models.TextField(null=True, blank=True)
     country_code = models.CharField(max_length=4, blank=True)
     drivers_license_number = models.CharField(max_length=20, blank=True)
-    phone_number = models.CharField(max_length=15, blank=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     website = models.URLField(blank=True)

@@ -15,37 +15,8 @@ from django.contrib.contenttypes.models import ContentType
 User = get_user_model()
 
 class Item(models.Model):
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='items',
-        help_text="Owner of the item"
-    )
-    name = models.CharField(
-        max_length=255,
-        validators=[
-            RegexValidator(
-                regex=r'^[\w\s\-]+$',
-                message='Name can only contain letters, numbers, spaces, and hyphens.'
-            )
-        ]
-    )
-    description = models.TextField(
-        help_text="Description of the item",
-        default='No description provided.'
-    )
-    category = models.CharField(
-        max_length=100,
-        help_text="Category of the item",
-        default='Uncategorized'
-    )
-    image = models.ImageField(
-        upload_to='item_images/',
-        validators=[validate_image_file_extension],
-        null=True,
-        blank=True,
-        help_text="Image of the item"
-    )
+    name = models.CharField(max_length=255)
+    description = models.TextField()
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -60,24 +31,20 @@ class Item(models.Model):
         ]
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='items_for_sale',default=1)
-    
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='items_for_sale')
+
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Item"
         verbose_name_plural = "Items"
         indexes = [
-            models.Index(fields=['owner']),
+            models.Index(fields=['seller']),
             models.Index(fields=['name']),
         ]
-        unique_together = ('owner', 'name')
+        unique_together = ('seller', 'name')
 
     def __str__(self):
-        return f'{self.name} by {self.owner.username}'
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+        return f'{self.name} by {self.seller.username}'
 
 class PurchaseOrder(models.Model):
     seller = models.ForeignKey(User, related_name='sales', on_delete=models.CASCADE)
