@@ -1,49 +1,41 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from craftify.models.cart_controller import Cart, CartItem
-from craftify.models.item_controller import Item, PurchaseOrder, PurchaseOrderItem
+from craftify.models.item_controller import Item
 from craftify.forms.cart_form import AddToCartForm, CartUpdateForm, CartRemoveForm
-from craftify.forms.item_form import PurchaseOrderForm, PurchaseOrderItemForm
 from django.contrib import messages
-from django.conf import settings
 
 @login_required
 def view_cart(request):
-    cart = get_object_or_404(Cart, user=request.user)
-    if request.method == 'POST':
-        # Handle updates to cart items
-        for item in cart.items.all():
-            form = CartUpdateForm(request.POST, prefix=str(item.id), instance=item)
-            if form.is_valid():
-                form.save()
-        messages.success(request, "Cart updated successfully.")
-        return redirect('view_cart')
-    else:
-        update_forms = {item.id: CartUpdateForm(prefix=str(item.id), instance=item) for item in cart.items.all()}
-        remove_form = CartRemoveForm()
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    update_forms = {item.id: CartUpdateForm(prefix=str(item.id), instance=item) for item in cart.items.all()}
+    remove_form = CartRemoveForm()
     context = {
         'cart': cart,
         'update_forms': update_forms,
         'remove_form': remove_form,
     }
-    return render(request, 'cart/view_cart.html', context)
+    return render(request, 'cart/cart.html', context)
 
 @login_required
 def add_to_cart(request, item_id):
     item = get_object_or_404(Item, id=item_id)
+    cart, created = Cart.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         form = AddToCartForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
+            cart_item, created = CartItem.objects.get_or_create(cart=cart, item=item)
+            cart_item.quantity += form.cleaned_data['quantity']
+            cart_item.save()
             messages.success(request, f"Added {form.cleaned_data['quantity']} x {item.name} to your cart.")
-            return redirect('view_cart')
+            return redirect('item_detail', item_id=item_id)
     else:
         form = AddToCartForm(initial={'item': item})
     context = {
         'form': form,
         'item': item,
     }
-    return render(request, 'cart/add_to_cart.html', context)
+    return render(request, 'item_detail.html', context)
 
 @login_required
 def remove_from_cart(request, item_id):
@@ -63,12 +55,11 @@ def checkout(request):
     if not cart.items.exists():
         messages.error(request, "Your cart is empty.")
         return redirect('view_cart')
-    
+
     if request.method == 'POST':
-        # Simulate payment confirmation
-        payment_confirmed = confirm_payment(request)
-        
-        if payment_confirmed:
+        # Simulate payment process
+        confirm_payment = True  #89-97 set up what could be actual business logic for a payment integrator
+        if confirm_payment:
             # Create a new PurchaseOrder
             purchase_order = PurchaseOrder.objects.create(
                 buyer=request.user,
@@ -96,12 +87,5 @@ def checkout(request):
     return render(request, 'cart/checkout.html', {'cart': cart})
 
 def confirm_payment(request):
-    """
-    Simulates payment confirmation.
-    For demo purposes, we'll assume all payments are successful.
-    In a real-world scenario, integrate with any payment gateway here.
-    You can also add logic to simulate different payment outcomes if necessary.
-
-    """
+    # Simulate payment process
     return True
-

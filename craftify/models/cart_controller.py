@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from .item_controller import Item, PurchaseOrder, PurchaseOrderItem
+from craftify.models.item_controller import Item, PurchaseOrder, PurchaseOrderItem
 
 User = get_user_model()
 
@@ -57,12 +57,13 @@ class Cart(models.Model):
         return purchase_order
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-    item = models.ForeignKey(Item, related_name='cart_items', on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(default=timezone.now)  # Ensure this field exists
 
     def __str__(self):
-        return f"{self.quantity} of {self.item.name} in cart of {self.cart.user.username}"
-    
+        return f"{self.quantity} x {self.item.name}"
+
     def get_total_price(self):
         return self.item.price * self.quantity

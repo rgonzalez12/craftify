@@ -32,4 +32,6 @@ urlpatterns = [
     path('profile/<int:user_id>/', user_views.profile, name='profile'),  # User profile
     path('item/<int:item_id>/', item_views.item_detail, name='item_detail'),  # Item detail view
     path('cart/add/<int:item_id>/', cart_views.add_to_cart, name='add_to_cart'),  # Add to cart view
+    path('cart/', cart_views.view_cart, name='view_cart'),  # View cart
+    path('checkout/', cart_views.checkout, name='checkout'),  # Checkout view
 ]
