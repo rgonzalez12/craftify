@@ -5,12 +5,17 @@
 {% block content %}
 <div class="container">
     <h2>Your Cart</h2>
-    {% if cart.items.all %}
+    {% if cart.items.exists %}
         <ul class="cart-items">
             {% for item in cart.items.all %}
                 <li class="cart-item">
                     <span>{{ item.quantity }} x {{ item.item.name }}</span>
                     <span>${{ item.get_total_price }}</span>
+                    <form method="post" action="{% url 'remove_item' item.item.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" value="{{ item.item.id }}">
+                        <button type="submit" class="button button-remove">Remove</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>

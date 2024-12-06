@@ -33,5 +33,6 @@ urlpatterns = [
     path('item/<int:item_id>/', item_views.item_detail, name='item_detail'),  # Item detail view
     path('cart/add/<int:item_id>/', cart_views.add_to_cart, name='add_to_cart'),  # Add to cart view
     path('cart/', cart_views.view_cart, name='view_cart'),  # View cart
+    path('cart/remove/<int:item_id>/', cart_views.remove_from_cart, name='remove_from_cart'),  # Remove from cart view
     path('checkout/', cart_views.checkout, name='checkout'),  # Checkout view
 ]

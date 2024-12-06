@@ -8,12 +8,10 @@ from django.contrib import messages
 @login_required
 def view_cart(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
-    update_forms = {item.id: CartUpdateForm(prefix=str(item.id), instance=item) for item in cart.items.all()}
-    remove_form = CartRemoveForm()
+    cart_items = cart.items.all()
     context = {
         'cart': cart,
-        'update_forms': update_forms,
-        'remove_form': remove_form,
+        'cart_items': cart_items,
     }
     return render(request, 'cart/cart.html', context)
 
@@ -22,15 +20,22 @@ def add_to_cart(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     cart, created = Cart.objects.get_or_create(user=request.user)
     if request.method == 'POST':
-        form = AddToCartForm(request.POST, user=request.user)
+        form = AddToCartForm(request.POST)
         if form.is_valid():
+            quantity = form.cleaned_data['quantity']
+
+            # Check if the item already exists in the cart
             cart_item, created = CartItem.objects.get_or_create(cart=cart, item=item)
-            cart_item.quantity += form.cleaned_data['quantity']
+            if not created:
+                cart_item.quantity += quantity
+            else:
+                cart_item.quantity = quantity
             cart_item.save()
-            messages.success(request, f"Added {form.cleaned_data['quantity']} x {item.name} to your cart.")
+            
+            messages.success(request, f"Added {quantity} x {item.name} to your cart.")
             return redirect('item_detail', item_id=item_id)
     else:
-        form = AddToCartForm(initial={'item': item})
+        form = AddToCartForm(initial={'quantity': 1})
     context = {
         'form': form,
         'item': item,
@@ -39,13 +44,12 @@ def add_to_cart(request, item_id):
 
 @login_required
 def remove_from_cart(request, item_id):
-    if request.method == 'POST':
-        form = CartRemoveForm(request.POST)
-        if form.is_valid():
-            item_id = form.cleaned_data['item_id']
-            cart_item = get_object_or_404(CartItem, cart__user=request.user, item__id=item_id)
-            cart_item.delete()
-            messages.success(request, f"Removed {cart_item.item.name} from your cart.")
+    cart = get_object_or_404(Cart, user=request.user)
+    item = get_object_or_404(Item, id=item_id)
+    cart_item = CartItem.objects.filter(cart=cart, item=item).first()
+    if cart_item:
+        cart_item.delete()
+        messages.success(request, f"Removed {item.name} from your cart.")
     return redirect('view_cart')
 
 @login_required
