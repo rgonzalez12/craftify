@@ -18,19 +18,21 @@ def signup(request):
             return redirect('home')  # Redirect to the home page after signup
     else:
         form = UserExtendedForm()
-    return render(request, 'users/signup.html', {'form': form})
+    return render(request, 'signup.html', {'form': form})
 
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect('home')
         else:
-            messages.error(request, 'Invalid username or password')
-    return render(request, 'users/login.html')
+            error = 'Invalid username or password.'
+            return render(request, 'login.html', {'error': error})
+    else:
+        return render(request, 'login.html')
 
 @login_required
 def user_logout(request):
@@ -99,5 +101,4 @@ def profile(request, user_id):
         })
     else:
         return render(request, 'users/view_profile.html', {'user': user})
-    
     
