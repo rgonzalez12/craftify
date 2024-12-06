@@ -13,7 +13,7 @@ def view_cart(request):
         'cart': cart,
         'cart_items': cart_items,
     }
-    return render(request, 'cart/cart.html', context)
+    return render(request, 'cart.html', context)
 
 @login_required
 def add_to_cart(request, item_id):

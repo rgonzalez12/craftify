@@ -42,7 +42,7 @@ def user_logout(request):
 @login_required
 def list_users(request):
     users = UserExtended.objects.all()
-    return render(request, 'users/list.html', {'users': users})
+    return render(request, 'list.html', {'users': users})
 
 @login_required
 def user_detail(request, user_id):
@@ -78,7 +78,7 @@ def delete_user(request, user_id):
     if request.method == 'POST':
         user.delete()
         return redirect('list_users')
-    return render(request, 'users/delete.html', {'user': user})
+    return render(request, 'delete.html', {'user': user})
 
 @login_required
 def profile(request, user_id):
