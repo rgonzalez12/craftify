@@ -47,7 +47,7 @@ def list_users(request):
 @login_required
 def user_detail(request, user_id):
     user = get_object_or_404(UserExtended, pk=user_id)
-    return render(request, 'users/detail.html', {'user': user})
+    return render(request, 'detail.html', {'user': user})
 
 @login_required
 def create_user(request):
@@ -58,7 +58,7 @@ def create_user(request):
             return redirect('list_users')
     else:
         form = UserExtendedForm()
-    return render(request, 'users/create.html', {'form': form})
+    return render(request, 'create.html', {'form': form})
 
 @login_required
 def update_user(request, user_id):
@@ -70,7 +70,7 @@ def update_user(request, user_id):
             return redirect('user_detail', user_id=user.id)
     else:
         form = UserExtendedForm(instance=user)
-    return render(request, 'users/update.html', {'form': form})
+    return render(request, 'update.html', {'form': form})
 
 @login_required
 def delete_user(request, user_id):
@@ -94,11 +94,11 @@ def profile(request, user_id):
         else:
             profile_form = UserProfileForm(instance=user)
             contact_form = UserContactForm(instance=user)
-        return render(request, 'users/edit_profile.html', {
+        return render(request, 'edit_profile.html', {
             'profile_form': profile_form,
             'contact_form': contact_form,
             'user': user
         })
     else:
-        return render(request, 'users/view_profile.html', {'user': user})
+        return render(request, 'view_profile.html', {'user': user})
     

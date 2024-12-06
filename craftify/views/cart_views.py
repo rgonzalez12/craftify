@@ -87,7 +87,7 @@ def checkout(request):
             messages.error(request, "Payment failed. Please try again.")
             return redirect('checkout')
 
-    return render(request, 'cart/checkout.html', {'cart': cart})
+    return render(request, 'checkout.html', {'cart': cart})
 
 def confirm_payment(request):
     # Simulate payment process

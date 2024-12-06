@@ -13,7 +13,7 @@ def home(request):
 
 def list_items(request):
     items = Item.objects.all()
-    return render(request, 'items/item_list.html', {'items': items})
+    return render(request, 'item_list.html', {'items': items})
 
 def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
@@ -34,7 +34,7 @@ def create_item(request):
             return redirect('list_items')
     else:
         form = ItemForm()
-    return render(request, 'items/item_form.html', {'form': form})
+    return render(request, 'item_form.html', {'form': form})
 
 @login_required
 def update_item(request, item_id):
@@ -49,7 +49,7 @@ def update_item(request, item_id):
             return redirect('item_detail', item_id=item.id)
     else:
         form = ItemForm(instance=item)
-    return render(request, 'items/item_form.html', {'form': form})
+    return render(request, 'item_form.html', {'form': form})
 
 @login_required
 def delete_item(request, item_id):
@@ -60,7 +60,7 @@ def delete_item(request, item_id):
         item.delete()
         messages.success(request, 'Item deleted successfully.')
         return redirect('list_items')
-    return render(request, 'items/item_confirm_delete.html', {'item': item})
+    return render(request, 'item_confirm_delete.html', {'item': item})
 
 @login_required
 def add_to_cart(request, item_id):
@@ -81,7 +81,7 @@ def remove_from_cart(request, item_id):
 @login_required
 def cart_detail(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
-    return render(request, 'cart/cart_detail.html', {'cart': cart})
+    return render(request, 'cart_detail.html', {'cart': cart})
 
 @login_required
 def checkout(request):
@@ -102,9 +102,9 @@ def checkout(request):
         cart.items.clear()
         messages.success(request, 'Checkout successful.')
         return redirect('order_detail', order_id=order.id)
-    return render(request, 'cart/checkout.html', {'cart': cart})
+    return render(request, 'checkout.html', {'cart': cart})
 
 @login_required
 def order_detail(request, order_id):
     order = get_object_or_404(PurchaseOrder, id=order_id, buyer=request.user)
-    return render(request, 'orders/order_detail.html', {'order': order})
+    return render(request, 'order_detail.html', {'order': order})
