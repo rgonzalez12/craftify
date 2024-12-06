@@ -1,9 +1,13 @@
 from django import forms
-from craftify.models.cart_controller import CartItem
+from craftify.models.cart_controller import Cart, CartItem
 
 class AddToCartForm(forms.ModelForm):
-    quantity = forms.IntegerField(min_value=1, initial=1, widget=forms.NumberInput(attrs={'class': 'form-input', 'min': '1'}))
-    
+    quantity = forms.IntegerField(
+        min_value=1,
+        initial=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'id': 'quantity-input'})
+    )
+
     class Meta:
         model = CartItem
         fields = ['item', 'quantity']
@@ -19,7 +23,10 @@ class AddToCartForm(forms.ModelForm):
 
     def save(self, commit=True):
         cart, created = Cart.objects.get_or_create(user=self.user)
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, item=self.cleaned_data['item'])
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            item=self.cleaned_data['item']
+        )
         cart_item.quantity += self.cleaned_data['quantity']
         if commit:
             cart_item.save()

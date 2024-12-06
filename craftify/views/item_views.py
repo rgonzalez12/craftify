@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from craftify.models.item_controller import Item 
 from craftify.models.cart_controller import Cart  
 from craftify.forms.item_form import ItemForm
+from craftify.forms.cart_form import AddToCartForm
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -16,7 +17,12 @@ def list_items(request):
 
 def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
-    return render(request, 'item_detail.html', {'item': item})
+    form = AddToCartForm(initial={'quantity': 1})
+    context = {
+        'item': item,
+        'form': form,
+    }
+    return render(request, 'item_detail.html', context)
 
 @login_required
 def create_item(request):

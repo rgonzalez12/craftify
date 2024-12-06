@@ -18,29 +18,28 @@ def view_cart(request):
 @login_required
 def add_to_cart(request, item_id):
     item = get_object_or_404(Item, id=item_id)
-    cart, created = Cart.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         form = AddToCartForm(request.POST)
         if form.is_valid():
             quantity = form.cleaned_data['quantity']
-
-            # Check if the item already exists in the cart
-            cart_item, created = CartItem.objects.get_or_create(cart=cart, item=item)
-            if not created:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            cart_item, item_created = CartItem.objects.get_or_create(cart=cart, item=item)
+            if not item_created:
                 cart_item.quantity += quantity
             else:
                 cart_item.quantity = quantity
             cart_item.save()
-            
             messages.success(request, f"Added {quantity} x {item.name} to your cart.")
             return redirect('item_detail', item_id=item_id)
+        else:
+            # Form is invalid; render the item detail page with errors
+            context = {
+                'item': item,
+                'form': form,
+            }
+            return render(request, 'item_detail.html', context)
     else:
-        form = AddToCartForm(initial={'quantity': 1})
-    context = {
-        'form': form,
-        'item': item,
-    }
-    return render(request, 'item_detail.html', context)
+        return redirect('item_detail', item_id=item_id)
 
 @login_required
 def remove_from_cart(request, item_id):
