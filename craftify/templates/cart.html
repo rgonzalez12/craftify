@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
     <h2>Your Cart</h2>
-    {% if cart.items.exists %}
+    {% if cart.items.all|length > 0 %}
         <ul class="cart-items">
             {% for item in cart.items.all %}
                 <li class="cart-item">
@@ -13,7 +13,7 @@
                     <span>${{ item.get_total_price }}</span>
                     <form method="post" action="{% url 'remove_item' item.item.id %}">
                         {% csrf_token %}
-                        <input type="hidden" name="item_id" value="{{ item.item.id }}">
+                        <!-- Removed hidden input if the remove view uses the URL param -->
                         <button type="submit" class="button button-remove">Remove</button>
                     </form>
                 </li>
