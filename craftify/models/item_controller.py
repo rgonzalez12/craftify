@@ -32,6 +32,8 @@ class Item(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='items_for_sale')
+    image = models.ImageField(upload_to='item_images/', null=True, blank=True)
+    category = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         ordering = ['-created_at']
