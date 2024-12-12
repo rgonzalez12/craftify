@@ -117,7 +117,13 @@ class ReturnOrder(models.Model):
     def check_and_update_review(self):
         time_difference = timezone.now() - self.purchase_order.created_at
         if time_difference <= timedelta(days=45):
-            review = Review.objects.filter(purchase_order_item__item=self.item, reviewer=self.buyer).first()
-            if review:
-                # Edit or delete the review as needed
-                review.delete()
+          item_content_type = ContentType.objects.get_for_model(Item)
+        
+        review = Review.objects.filter(
+            content_type=item_content_type,
+            object_id=self.item.id,
+            user=self.buyer
+        ).first()
+        
+        if review:
+           review.delete()
