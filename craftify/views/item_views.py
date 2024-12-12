@@ -8,26 +8,16 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 
 def home(request):
-    """
-    Show homepage with a list of all items.
-    """
     items = Item.objects.all()
     return render(request, 'home.html', {'items': items})
 
 
 def list_items(request):
-    """
-    List all available items.
-    """
     items = Item.objects.all()
     return render(request, 'item_list.html', {'items': items})
 
 
 def item_detail(request, item_id):
-    """
-    Show item details and provide a form to add it to the cart.
-    Actual adding to the cart is handled by the cart views add_to_cart endpoint.
-    """
     item = get_object_or_404(Item, id=item_id)
     # Provide an initial AddToCartForm with quantity=1 as a default
     form = AddToCartForm(initial={'quantity': 1})
@@ -40,9 +30,6 @@ def item_detail(request, item_id):
 
 @login_required
 def create_item(request):
-    """
-    Create a new item. ItemForm is used for validation and saving.
-    """
     if request.method == 'POST':
         form = ItemForm(request.POST, request.FILES)
         if form.is_valid():
@@ -59,9 +46,6 @@ def create_item(request):
 
 @login_required
 def update_item(request, item_id):
-    """
-    Update an existing item. Permission check ensures only the owner can update.
-    """
     item = get_object_or_404(Item, id=item_id)
     # Assuming item has an owner field:
     # if item.owner != request.user:
@@ -80,9 +64,6 @@ def update_item(request, item_id):
 
 @login_required
 def delete_item(request, item_id):
-    """
-    Delete an existing item. Only the owner can delete.
-    """
     item = get_object_or_404(Item, id=item_id)
     # if item.owner != request.user:
     #     raise PermissionDenied
