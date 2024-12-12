@@ -38,20 +38,25 @@ class Cart(models.Model):
 
     def process_to_purchase_order(self):
         if not self.items.exists():
-            return None
+          return None
 
         purchase_order = PurchaseOrder.objects.create(
-            seller=self.items.first().item.owner,
-            buyer=self.user,
-            created_at=timezone.now()
-        )
+          seller=self.items.first().item.seller,
+           buyer=self.user
+       )
 
+        total_amount = 0
         for cart_item in self.items.all():
-            PurchaseOrderItem.objects.create(
-                purchase_order=purchase_order,
-                item=cart_item.item,
-                quantity=cart_item.quantity
-            )
+            po_item = PurchaseOrderItem.objects.create(
+            purchase_order=purchase_order,
+            item=cart_item.item,
+            quantity=cart_item.quantity,
+            price=cart_item.item.price * cart_item.quantity
+        )
+        total_amount += po_item.price
+
+        purchase_order.total_amount = total_amount
+        purchase_order.save()
 
         self.clear_cart()
         return purchase_order
