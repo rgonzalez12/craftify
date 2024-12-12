@@ -25,7 +25,7 @@ class UserExtendedForm(forms.ModelForm):
         label='Password',
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         validators=[validate_password],
-        help_text="Password must be at least 8 characters long and contain at least one uppercase letter and one number."
+        help_text="Password must meet complexity requirements."
     )
     password2 = forms.CharField(
         label='Confirm Password',
@@ -52,7 +52,7 @@ class UserExtendedForm(forms.ModelForm):
         validators=[
             RegexValidator(
                 regex=r'^\+?1?\d{9,15}$',
-                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+                message="Phone number must be in the format '+999999999'. Up to 15 digits allowed."
             )
         ],
         widget=forms.TextInput(attrs={'class': 'form-control'}),
@@ -62,33 +62,37 @@ class UserExtendedForm(forms.ModelForm):
     class Meta:
         model = UserExtended
         fields = [
-            'email',
-            'username',
-            'password1',
-            'password2',
-            'date_of_birth',
-            'drivers_license_number',
-            'country_code',
-            'phone_number'
+            'email', 'username', 'password1', 'password2', 'date_of_birth',
+            'drivers_license_number', 'country_code', 'phone_number'
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['password1'].required = False
+            self.fields['password1'].help_text = "Leave blank to keep the existing password."
+            self.fields['password2'].required = False
+            self.fields['password2'].help_text = "Leave blank to keep the existing password."
 
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
-
-        if password1 and password2:
-            if password1 != password2:
-                self.add_error('password2', "Passwords do not match.")
-        
+        if (self.instance and self.instance.pk) and not (password1 or password2):
+            return cleaned_data
+        if password1 and password2 and password1 != password2:
+            self.add_error('password2', "Passwords do not match.")
         return cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
+        password1 = self.cleaned_data.get("password1")
+        if password1:
+            user.set_password(password1)
         if commit:
             user.save()
         return user
+
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -100,6 +104,7 @@ class UserProfileForm(forms.ModelForm):
             'profile_picture': forms.ClearableFileInput(attrs={'class': 'form-input'}),
             'website': forms.URLInput(attrs={'class': 'form-input', 'placeholder': 'Your website'}),
         }
+
 
 class UserContactForm(forms.ModelForm):
     email = forms.EmailField(

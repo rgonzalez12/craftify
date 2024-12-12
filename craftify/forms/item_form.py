@@ -4,7 +4,7 @@ from craftify.models.item_controller import Item, PurchaseOrder, PurchaseOrderIt
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['name', 'description', 'price', 'quantity', 'seller'] 
+        fields = ['name', 'description', 'price', 'quantity', 'seller', 'image', 'category']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Enter item name'}),
             'description': forms.Textarea(attrs={'class': 'form-textarea', 'placeholder': 'Enter item description'}),
@@ -18,6 +18,7 @@ class ItemForm(forms.ModelForm):
         if price is not None and price <= 0:
             raise forms.ValidationError("Price must be greater than zero.")
         return price
+
 
 class PurchaseOrderForm(forms.ModelForm):
     class Meta:
@@ -43,6 +44,7 @@ class PurchaseOrderForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
 
 class PurchaseOrderItemForm(forms.ModelForm):
     class Meta:
@@ -71,6 +73,7 @@ class PurchaseOrderItemForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
 
 class ReviewForm(forms.ModelForm):
     class Meta:
