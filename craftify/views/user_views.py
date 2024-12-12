@@ -11,10 +11,6 @@ def home(request):
     return render(request, 'home.html')
 
 def signup(request):
-    """
-    Signup a new user using UserExtendedForm.
-    On success, log the user in and redirect to home.
-    """
     if request.method == 'POST':
         form = UserExtendedForm(request.POST, request.FILES)
         if form.is_valid():
@@ -29,36 +25,27 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 def user_login(request):
-    """
-    Log in the user with given username and password.
-    On success, redirect to home. On failure, show error.
-    """
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
-            messages.success(request, 'Login successful.')
             return redirect('home')
         else:
-            messages.error(request, 'Invalid username or password.')
-    return render(request, 'login.html')
+            messages.error(request, 'Invalid email or password.')
+            return redirect('login')
+    else:
+        return render(request, 'login.html')
 
 @login_required
 def user_logout(request):
-    """
-    Log out the current user and redirect to home.
-    """
     logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('home')
 
 @login_required
 def list_users(request):
-    """
-    List all users. Restrict to staff to prevent data exposure.
-    """
     if not request.user.is_staff:
         raise PermissionDenied("You do not have permission to view the user list.")
     users = UserExtended.objects.all()
@@ -66,11 +53,6 @@ def list_users(request):
 
 @login_required
 def user_detail(request, user_id):
-    """
-    View a specific user's details.
-    Staff can view all details; non-staff can only view their own.
-    Adjust as needed for your logic.
-    """
     user = get_object_or_404(UserExtended, pk=user_id)
     if not request.user.is_staff and request.user != user:
         raise PermissionDenied("You do not have permission to view this user's details.")
@@ -78,9 +60,6 @@ def user_detail(request, user_id):
 
 @login_required
 def create_user(request):
-    """
-    Create a new user. Usually, this is an admin action.
-    """
     if not request.user.is_staff:
         raise PermissionDenied("You do not have permission to create a new user.")
     if request.method == 'POST':
@@ -97,11 +76,6 @@ def create_user(request):
 
 @login_required
 def update_user(request, user_id):
-    """
-    Update a user's details.
-    - Staff can update any user.
-    - A user can update their own details.
-    """
     user = get_object_or_404(UserExtended, pk=user_id)
     if request.user != user and not request.user.is_staff:
         raise PermissionDenied("You do not have permission to update this user.")
@@ -120,11 +94,6 @@ def update_user(request, user_id):
 
 @login_required
 def delete_user(request, user_id):
-    """
-    Delete a user.
-    - Staff can delete any user.
-    - A user can delete their own account if desired (optional logic).
-    """
     user = get_object_or_404(UserExtended, pk=user_id)
     if request.user != user and not request.user.is_staff:
         raise PermissionDenied("You do not have permission to delete this user.")
@@ -137,10 +106,6 @@ def delete_user(request, user_id):
 
 @login_required
 def profile(request, user_id):
-    """
-    View or edit a user's profile.
-    The user can edit their own profile, while others can only view it.
-    """
     user = get_object_or_404(UserExtended, pk=user_id)
     if request.user == user:
         # The logged-in user is viewing their own profile, allow editing.

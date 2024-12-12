@@ -35,7 +35,7 @@ def add_to_cart(request, item_id):
                 cart_item.quantity += quantity
             cart_item.save()
             messages.success(request, f"Added {quantity} of {item.name} to your cart.")
-            return redirect('view_cart')
+            return redirect('cart')
         else:
             messages.error(request, "Invalid quantity. Please try again.")
     else:
@@ -56,7 +56,7 @@ def remove_from_cart(request, item_id):
     if cart_item:
         cart_item.delete()
         messages.success(request, f"Removed {item.name} from your cart.")
-    return redirect('view_cart')
+    return redirect('cart')
 
 
 @login_required
@@ -64,7 +64,7 @@ def checkout(request):
     cart = get_object_or_404(Cart, user=request.user)
     if not cart.items.exists():
         messages.error(request, "Your cart is empty.")
-        return redirect('view_cart')
+        return redirect('cart')
     if request.method == 'POST':
         # Simulate payment process
         confirm_payment = True  # In reality, integrate with a payment gateway

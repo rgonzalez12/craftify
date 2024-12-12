@@ -13,7 +13,6 @@
                     <span>${{ item.get_total_price }}</span>
                     <form method="post" action="{% url 'remove_item' item.item.id %}">
                         {% csrf_token %}
-                        <!-- Removed hidden input if the remove view uses the URL param -->
                         <button type="submit" class="button button-remove">Remove</button>
                     </form>
                 </li>
