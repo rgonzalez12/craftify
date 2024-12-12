@@ -14,7 +14,7 @@
         <nav>
             <ul class="flex space-x-4">
                 <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'list_users' %}">Users</a></li>
+                <li><a href="{% url 'list_users' %}">Seller List</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'cart' %}">Cart</a></li>
                     <li><a href="{% url 'profile' user.id %}">Edit Profile</a></li>
