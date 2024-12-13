@@ -7,6 +7,11 @@ from craftify.models.cart_controller import Cart
 from craftify.forms.item_form import ItemForm
 from craftify.forms.cart_form import AddToCartForm
 
+#from craftify.ml_utils import run_inference
+#from PIL import Image
+#import torchvision.transforms as transforms
+#import io
+
 def home(request):
     items = Item.objects.all()
     return render(request, 'home.html', {'items': items})
@@ -76,3 +81,28 @@ def delete_item(request, item_id):
         messages.success(request, 'Item deleted successfully.')
         return redirect('my_items')
     return render(request, 'item_confirm_delete.html', {'item': item})
+
+"""
+@login_required
+def classify_item_image(request):
+    if request.method == 'POST' and 'item_image' in request.FILES:
+        image_file = request.FILES['item_image']
+        pil_image = Image.open(image_file).convert('RGB')
+
+        transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225])
+        ])
+
+        input_tensor = transform(pil_image).unsqueeze(0)
+
+        prediction = run_inference(input_tensor)
+        class_names = ['Class A', 'Class B']
+        predicted_class = class_names[prediction]
+
+        return render(request, 'classification_result.html', {'predicted_class': predicted_class})
+    else:
+        return render(request, 'upload_image.html')
+"""
