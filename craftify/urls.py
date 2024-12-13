@@ -20,23 +20,23 @@ from .views import item_views, user_views, cart_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', item_views.home, name='home'),  # Home view
-    path('signup/', user_views.signup, name='signup'),  # User signup
-    path('login/', user_views.user_login, name='login'),  # User login
-    path('logout/', user_views.user_logout, name='logout'),  # User logout
-    path('users/', user_views.list_users, name='list_users'),  # List all users
-    path('users/<int:user_id>/', user_views.user_detail, name='user_detail'),  # User detail
-    path('users/create/', user_views.create_user, name='create_user'),  # Create user
-    path('users/<int:user_id>/update/', user_views.update_user, name='update_user'),  # Update user
-    path('users/<int:user_id>/delete/', user_views.delete_user, name='delete_user'),  # Delete user
-    path('profile/<int:user_id>/', user_views.profile, name='profile'),  # User profile
-    path('item/<int:item_id>/', item_views.item_detail, name='item_detail'),  # Item detail view
-    path('cart/', cart_views.view_cart, name='cart'),  # View cart
-    path('cart/add/<int:item_id>/', cart_views.add_to_cart, name='add_to_cart'),  # Add to cart view
-    path('cart/remove/<int:item_id>/', cart_views.remove_from_cart, name='remove_item'),  # Remove from cart view
+    path('', item_views.home, name='home'),
+    path('signup/', user_views.signup, name='signup'),  
+    path('login/', user_views.user_login, name='login'),  
+    path('logout/', user_views.user_logout, name='logout'),  
+    path('users/', user_views.list_users, name='list_users'),  
+    path('users/<int:user_id>/', user_views.user_detail, name='user_detail'),  
+    path('users/create/', user_views.create_user, name='create_user'),  
+    path('users/<int:user_id>/update/', user_views.update_user, name='update_user'),  
+    path('users/<int:user_id>/delete/', user_views.delete_user, name='delete_user'),  
+    path('profile/<int:user_id>/', user_views.profile, name='profile'),  
+    path('item/<int:item_id>/', item_views.item_detail, name='item_detail'),  
+    path('cart/', cart_views.view_cart, name='cart'), 
+    path('cart/add/<int:item_id>/', cart_views.add_to_cart, name='add_to_cart'),  
+    path('cart/remove/<int:item_id>/', cart_views.remove_from_cart, name='remove_item'),  
     path('checkout/', cart_views.checkout, name='checkout'),
-    path('items/my/', MyItemsView.as_view(), name='my_items'),
-    path('items/create/', ItemCreateView.as_view(), name='item_create'),
-    path('items/<int:pk>/edit/', ItemUpdateView.as_view(), name='item_edit'),
-    path('items/<int:pk>/delete/', ItemDeleteView.as_view(), name='item_delete')
+    path('items/my/', item_views.my_items, name='my_items'),
+    path('items/create/', item_views.create_item, name='item_create'),
+    path('items/<int:pk>/edit/', item_views.update_item, name='item_edit'),
+    path('items/<int:pk>/delete/', item_views.delete_item, name='item_delete')
 ]
