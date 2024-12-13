@@ -108,7 +108,6 @@ def delete_user(request, user_id):
 def profile(request, user_id):
     user = get_object_or_404(UserExtended, pk=user_id)
     if request.user == user:
-        # The logged-in user is viewing their own profile, allow editing.
         if request.method == 'POST':
             profile_form = UserProfileForm(request.POST, request.FILES, instance=user)
             contact_form = UserContactForm(request.POST, instance=user)
@@ -128,5 +127,4 @@ def profile(request, user_id):
             'user': user
         })
     else:
-        # Another user is viewing the profile - read-only view
         return render(request, 'view_profile.html', {'user': user})
