@@ -16,7 +16,8 @@
                 <li><a href="{% url 'home' %}">Home</a></li>
                 <li><a href="{% url 'list_users' %}">Seller List</a></li>
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'cart' %}">Cart</a></li>
+                    <li><a href="{% url 'cart' %}">My Cart</a></li>
+                    <li><a href="{% url '' %}">My Items for Sale</a></li>
                     <li><a href="{% url 'profile' user.id %}">Edit Profile</a></li>
                     <li><a href="{% url 'delete_user' user.id %}">Delete Account</a></li>
                     <li><a href="{% url 'logout' %}">Logout</a></li>

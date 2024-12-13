@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}My Items for Sale{% endblock %}
+
+{% block content %}
+
+<h1>Current Items</h1>
+<a href="{% url 'item_create' %}">Create New Item</a>
+<ul>
+  {% for item in items %}
+    <li>
+      {{ item.name }} - ${{ item.price }}
+      <a href="{% url 'item_update' item.pk %}">Edit</a>
+      <a href="{% url 'item_delete' item.pk %}">Delete</a>
+    </li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

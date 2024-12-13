@@ -34,5 +34,9 @@ urlpatterns = [
     path('cart/', cart_views.view_cart, name='cart'),  # View cart
     path('cart/add/<int:item_id>/', cart_views.add_to_cart, name='add_to_cart'),  # Add to cart view
     path('cart/remove/<int:item_id>/', cart_views.remove_from_cart, name='remove_item'),  # Remove from cart view
-    path('checkout/', cart_views.checkout, name='checkout'),  # Checkout view
+    path('checkout/', cart_views.checkout, name='checkout'),
+    path('items/my/', MyItemsView.as_view(), name='my_items'),
+    path('items/create/', ItemCreateView.as_view(), name='item_create'),
+    path('items/<int:pk>/edit/', ItemUpdateView.as_view(), name='item_edit'),
+    path('items/<int:pk>/delete/', ItemDeleteView.as_view(), name='item_delete')
 ]
