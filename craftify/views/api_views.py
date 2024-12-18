@@ -37,7 +37,7 @@ class SignupView(APIView):
         user = User.objects.create(
             username=username,
             email=email,
-            password=make_password(password)
+            password=make_password
         )
         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 

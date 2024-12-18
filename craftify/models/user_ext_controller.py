@@ -47,3 +47,7 @@ class UserExtended(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+    
+    ### I'm going to leave this comment here as I know this dummy user is persisted to the database. 
+    ### I'll need a way to fix the login flow at some point so, this is a good test user to use. 
+    ### username: thisisatest123 password: Password123!

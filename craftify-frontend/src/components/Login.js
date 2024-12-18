@@ -11,6 +11,8 @@ function Login() {
   function handleSubmit(e) {
     e.preventDefault();
     setError('');
+
+    // Use 'username' key with the email value as required by TokenObtainPairView
     api.post('token/', { username: email, password: password })
       .then(response => {
         const { access } = response.data;
