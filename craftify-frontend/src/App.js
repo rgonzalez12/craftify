@@ -1,18 +1,29 @@
-import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './components/Home';
 import MyItems from './components/MyItems';
-import CreateItem from './components/CreateItem';
-import EditItem from './components/EditItem';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Cart from './components/Cart';
+import Profile from './components/Profile';
+import DeleteUser from './components/DeleteUser';
 
 function App() {
   return (
-    <BrowserRouter>
+    // Layout provides the header, footer, and main structure
+    <Layout>
+      {/* Routes define which component to show for each path */}
       <Routes>
-        <Route path="/" element={<MyItems />} />
-        <Route path="/create" element={<CreateItem />} />
-        <Route path="/edit/:id" element={<EditItem />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/items" element={<MyItems />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/profile/:id" element={<Profile />} />
+        <Route path="/delete_user/:id" element={<DeleteUser />} />
       </Routes>
-    </BrowserRouter>
+    </Layout>
   );
 }
 
