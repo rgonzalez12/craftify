@@ -3,215 +3,265 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 function EditProfile() {
-  const { id } = useParams();  
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [bio, setBio] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [profilePicture, setProfilePicture] = useState(null);
-  const [website, setWebsite] = useState('');
-  const [email, setEmail] = useState('');
-  const [countryCode, setCountryCode] = useState('');
-  const [address, setAddress] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const [formData, setFormData] = useState({
+    bio: '',
+    dateOfBirth: '',
+    profilePicture: null,
+    website: '',
+    email: '',
+    countryCode: '',
+    address: '',
+    phoneNumber: ''
+  });
+
   const [profileFormErrors, setProfileFormErrors] = useState({});
   const [contactFormErrors, setContactFormErrors] = useState({});
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    api.get(`user/${id}/`)
-      .then(response => {
+    const fetchUserData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await api.get(`user/${id}/`);
         const user = response.data;
-        setBio(user.bio || '');
-        setDateOfBirth(user.date_of_birth || '');
-        setWebsite(user.website || '');
-        setEmail(user.email || '');
-        setCountryCode(user.country_code || '');
-        setAddress(user.address || '');
-        setPhoneNumber(user.phone_number || '');
-      })
-      .catch(() => {
+        setFormData({
+          bio: user.bio || '',
+          dateOfBirth: user.date_of_birth || '',
+          website: user.website || '',
+          email: user.email || '',
+          countryCode: user.country_code || '',
+          address: user.address || '',
+          phoneNumber: user.phone_number || ''
+        });
+      } catch (err) {
+        setError('Error fetching user data.');
         setMessages(['Error fetching user data.']);
-      });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, [id]);
 
-  function handleSubmit(e) {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      profilePicture: e.target.files[0]
+    }));
+  };
+
+  const validateForm = () => {
+    const errors = {
+      profile: {},
+      contact: {}
+    };
+
+    // Profile validation
+    if (!formData.bio) errors.profile.bio = 'Bio is required';
+    if (!formData.dateOfBirth) errors.profile.dateOfBirth = 'Date of birth is required';
+    if (formData.website && !formData.website.startsWith('http')) {
+      errors.profile.website = 'Website must start with http:// or https://';
+    }
+
+    // Contact validation
+    if (!formData.email) errors.contact.email = 'Email is required';
+    if (!formData.phoneNumber) errors.contact.phoneNumber = 'Phone number is required';
+    if (!formData.countryCode) errors.contact.countryCode = 'Country code is required';
+    if (!formData.address) errors.contact.address = 'Address is required';
+
+    return errors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMessages([]);
     setProfileFormErrors({});
     setContactFormErrors({});
+    setIsLoading(true);
 
-    const formData = new FormData();
-    formData.append('bio', bio);
-    formData.append('date_of_birth', dateOfBirth);
-    formData.append('website', website);
-    if (profilePicture) {
-      formData.append('profile_picture', profilePicture);
+    const errors = validateForm();
+    if (Object.keys(errors.profile).length > 0 || Object.keys(errors.contact).length > 0) {
+      setProfileFormErrors(errors.profile);
+      setContactFormErrors(errors.contact);
+      setIsLoading(false);
+      return;
     }
-    formData.append('email', email);
-    formData.append('country_code', countryCode);
-    formData.append('address', address);
-    formData.append('phone_number', phoneNumber);
 
-    api.put(`user/${id}/`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-      .then(() => {
-        setMessages(['Profile updated successfully.']);
-        // navigate(`/profile/${id}`);
-      })
-      .catch(error => {
-        if (error.response && error.response.data) {
-          const data = error.response.data;
-          setMessages(['There was an error updating your profile.']);
-          if (data.profile_errors) setProfileFormErrors(data.profile_errors);
-          if (data.contact_errors) setContactFormErrors(data.contact_errors);
-        } else {
-          setMessages(['An unexpected error occurred.']);
-        }
+    const submitData = new FormData();
+    Object.keys(formData).forEach(key => {
+      if (formData[key] !== null) {
+        submitData.append(key, formData[key]);
+      }
+    });
+
+    try {
+      await api.put(`user/${id}/`, submitData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-  }
+      setMessages(['Profile updated successfully']);
+      navigate(`/profile/${id}`);
+    } catch (err) {
+      setError(err.message);
+      setMessages(['Error updating profile']);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-semibold mb-4">Edit Your Profile</h1>
-
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
+      
       {messages.length > 0 && (
-        <ul className="mb-4">
-          {messages.map((msg, i) => (
-            <li key={i}>{msg}</li>
+        <div className="mb-4">
+          {messages.map((message, index) => (
+            <div key={index} className="p-4 bg-blue-100 text-blue-700 rounded">
+              {message}
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
-      <form
-        method="post"
-        encType="multipart/form-data"
-        className="space-y-6 bg-white p-6 rounded-lg shadow-md"
-        onSubmit={handleSubmit}
-      >
-        <h2 className="text-xl font-bold">Profile Information</h2>
-        {/* Non-field errors for profile_form */}
-        {Object.keys(profileFormErrors).length > 0 && profileFormErrors.non_field_errors && (
-          <div className="text-red-500">
-            {profileFormErrors.non_field_errors.map((error, i) => <p key={i}>{error}</p>)}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Profile Information</h2>
+          
+          <div>
+            <label className="block mb-2">Bio</label>
+            <textarea
+              name="bio"
+              value={formData.bio}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            {profileFormErrors.bio && (
+              <p className="text-red-500 text-sm">{profileFormErrors.bio}</p>
+            )}
           </div>
-        )}
 
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700 mb-1">Bio</label>
-          <textarea
-            className="w-full border rounded px-3 py-2"
-            value={bio}
-            onChange={e => setBio(e.target.value)}
-          />
-          {profileFormErrors.bio && profileFormErrors.bio.map((err, i) => (
-            <p key={i} className="text-red-500">{err}</p>
-          ))}
-        </div>
-
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700 mb-1">Date of Birth</label>
-          <input
-            type="date"
-            className="w-full border rounded px-3 py-2"
-            value={dateOfBirth}
-            onChange={e => setDateOfBirth(e.target.value)}
-          />
-          {profileFormErrors.date_of_birth && profileFormErrors.date_of_birth.map((err, i) => (
-            <p key={i} className="text-red-500">{err}</p>
-          ))}
-        </div>
-
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700 mb-1">Profile Picture</label>
-          <input
-            type="file"
-            onChange={e => setProfilePicture(e.target.files[0])}
-          />
-          {profileFormErrors.profile_picture && profileFormErrors.profile_picture.map((err, i) => (
-            <p key={i} className="text-red-500">{err}</p>
-          ))}
-        </div>
-
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700 mb-1">Website</label>
-          <input
-            type="url"
-            className="w-full border rounded px-3 py-2"
-            value={website}
-            onChange={e => setWebsite(e.target.value)}
-          />
-          {profileFormErrors.website && profileFormErrors.website.map((err, i) => (
-            <p key={i} className="text-red-500">{err}</p>
-          ))}
-        </div>
-
-        <h2 className="text-xl font-bold mt-6">Contact Information</h2>
-        {/* Non-field errors for contact_form */}
-        {Object.keys(contactFormErrors).length > 0 && contactFormErrors.non_field_errors && (
-          <div className="text-red-500">
-            {contactFormErrors.non_field_errors.map((error, i) => <p key={i}>{error}</p>)}
+          <div>
+            <label className="block mb-2">Date of Birth</label>
+            <input
+              type="date"
+              name="dateOfBirth"
+              value={formData.dateOfBirth}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            {profileFormErrors.dateOfBirth && (
+              <p className="text-red-500 text-sm">{profileFormErrors.dateOfBirth}</p>
+            )}
           </div>
-        )}
 
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700 mb-1">Email</label>
-          <input
-            type="email"
-            className="w-full border rounded px-3 py-2"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-          {contactFormErrors.email && contactFormErrors.email.map((err, i) => (
-            <p key={i} className="text-red-500">{err}</p>
-          ))}
+          <div>
+            <label className="block mb-2">Website</label>
+            <input
+              type="url"
+              name="website"
+              value={formData.website}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            {profileFormErrors.website && (
+              <p className="text-red-500 text-sm">{profileFormErrors.website}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block mb-2">Profile Picture</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
         </div>
 
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700 mb-1">Country Code</label>
-          <input
-            type="text"
-            className="w-full border rounded px-3 py-2"
-            value={countryCode}
-            onChange={e => setCountryCode(e.target.value)}
-          />
-          {contactFormErrors.country_code && contactFormErrors.country_code.map((err, i) => (
-            <p key={i} className="text-red-500">{err}</p>
-          ))}
-        </div>
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Contact Information</h2>
+          
+          <div>
+            <label className="block mb-2">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            {contactFormErrors.email && (
+              <p className="text-red-500 text-sm">{contactFormErrors.email}</p>
+            )}
+          </div>
 
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700 mb-1">Address</label>
-          <input
-            type="text"
-            className="w-full border rounded px-3 py-2"
-            value={address}
-            onChange={e => setAddress(e.target.value)}
-          />
-          {contactFormErrors.address && contactFormErrors.address.map((err, i) => (
-            <p key={i} className="text-red-500">{err}</p>
-          ))}
-        </div>
+          <div>
+            <label className="block mb-2">Country Code</label>
+            <input
+              type="text"
+              name="countryCode"
+              value={formData.countryCode}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            {contactFormErrors.countryCode && (
+              <p className="text-red-500 text-sm">{contactFormErrors.countryCode}</p>
+            )}
+          </div>
 
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700 mb-1">Phone Number</label>
-          <input
-            type="text"
-            className="w-full border rounded px-3 py-2"
-            value={phoneNumber}
-            onChange={e => setPhoneNumber(e.target.value)}
-          />
-          {contactFormErrors.phone_number && contactFormErrors.phone_number.map((err, i) => (
-            <p key={i} className="text-red-500">{err}</p>
-          ))}
+          <div>
+            <label className="block mb-2">Phone Number</label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            {contactFormErrors.phoneNumber && (
+              <p className="text-red-500 text-sm">{contactFormErrors.phoneNumber}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block mb-2">Address</label>
+            <textarea
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            {contactFormErrors.address && (
+              <p className="text-red-500 text-sm">{contactFormErrors.address}</p>
+            )}
+          </div>
         </div>
 
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={isLoading}
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-blue-300"
         >
-          Save Changes
+          {isLoading ? 'Saving...' : 'Save Changes'}
         </button>
       </form>
     </div>
