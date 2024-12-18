@@ -1,16 +1,14 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-
+from django.contrib.auth import get_user_model
 from craftify.models.item_controller import Item
-from craftify.models.cart_controller import Cart, CartItem
 from craftify.models.address_controller import Address
+from craftify.models.cart_controller import Cart, CartItem
 
 User = get_user_model()
 
 class ItemSerializer(serializers.ModelSerializer):
     seller_username = serializers.ReadOnlyField(source='seller.username', read_only=True)
-
     class Meta:
         model = Item
         fields = [
@@ -27,7 +25,6 @@ class ItemSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'seller', 'seller_username', 'created_at']
 
-
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
@@ -40,7 +37,6 @@ class AddressSerializer(serializers.ModelSerializer):
             'country'
         ]
         read_only_fields = ['id']
-
 
 class UserProfileSerializer(serializers.ModelSerializer):
     address = AddressSerializer(required=False)
@@ -84,14 +80,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-
 class CartItemSerializer(serializers.ModelSerializer):
     item = ItemSerializer(read_only=True)
 
     class Meta:
         model = CartItem
         fields = ['item', 'quantity']
-
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
