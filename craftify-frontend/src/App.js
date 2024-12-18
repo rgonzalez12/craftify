@@ -11,7 +11,6 @@ import DeleteUser from './components/DeleteUser';
 
 function App() {
   return (
-    // Layout provides the header, footer, and main structure
     <Layout>
       {/* Routes define which component to show for each path */}
       <Routes>
