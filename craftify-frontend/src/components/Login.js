@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import axios from 'axios';
 
 function Login() {
   const navigate = useNavigate();
@@ -19,40 +19,48 @@ function Login() {
     }));
   };
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await api.post('token/', formData);
-      const { access } = response.data;
-      localStorage.setItem('token', access);
-      api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-      navigate('/items');
+      const response = await axios.post('http://localhost:8000/api/token/', {
+        username: formData.username,
+        password: formData.password
+      });
+
+      if (response.data.access) {
+        localStorage.setItem('token', response.data.access);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error('Login error:', err.response?.data);
-      setError(err.response?.data?.detail || 'Invalid username or password.');
+      setError(
+        err.response?.data?.detail || 
+        'Login failed. Please check your credentials.'
+      );
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
         </div>
+        {error && (
+          <div className="rounded-md bg-red-50 p-4">
+            <div className="text-sm text-red-700">{error}</div>
+          </div>
+        )}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="-space-y-px">
             <div>
               <label htmlFor="username" className="sr-only">Username</label>
               <input

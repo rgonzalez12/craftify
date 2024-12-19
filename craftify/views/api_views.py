@@ -9,17 +9,21 @@ from craftify.models.item_controller import Item
 from craftify.models.cart_controller import Cart, CartItem
 from craftify.serializers.serializers import ItemSerializer, UserProfileSerializer
 from craftify.permissions import IsSellerOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 User = get_user_model()
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-    permission_classes = [IsSellerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsSellerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(seller=self.request.user)
 
+class TokenObtainPairView(TokenObtainPairView):
+    permission_classes = [AllowAny]        
 
 class SignupView(APIView):
     def post(self, request, *args, **kwargs):

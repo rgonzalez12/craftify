@@ -34,7 +34,8 @@ INSTALLED_APPS = [
     'craftify',
     'corsheaders',
     'django_seed',
-    'rest_framework', 
+    'rest_framework',
+    'rest_framework_simplejwt', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,6 +63,30 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     "http://localhost:3001",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_COOKIE': 'access_token',
+    'AUTH_COOKIE_SECURE': False,    
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_SAMESITE': 'Lax',
+}
 
 ROOT_URLCONF = 'craftify.urls'
 
