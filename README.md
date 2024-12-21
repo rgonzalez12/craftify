@@ -30,7 +30,6 @@ Craftify leverages Django’s robust ORM and is integrated with a React frontend
 Clone the Repository:
 
 ```bash
-Copy code
 git clone https://github.com/YourUsername/craftify.git
 cd craftify
 ```
@@ -45,7 +44,6 @@ Install Dependencies:
 ```
 
 ```bash
-Copy code
 pip install -r requirements.txt
 ```
 
@@ -79,7 +77,6 @@ Start Frontend:
 Navigate to the frontend directory and run:
 
 ```bash
-Copy code
 npm install
 npm start
 ```
