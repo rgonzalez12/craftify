@@ -35,7 +35,7 @@ git clone https://github.com/YourUsername/craftify.git
 cd craftify
 ```
 
-### Create and Activate a Virtual Environment (recommended):
+## Create and Activate a Virtual Environment (recommended):
 
 ```bash
 python -m venv venv
@@ -51,14 +51,14 @@ pip install -r requirements.txt
 
 This will install Django, Django REST Framework, SimpleJWT, and any other libraries needed by Craftify.
 
-Run Migrations:
+## Run Migrations:
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-Create a Superuser (optional but recommended):
+## Create a Superuser (optional but recommended):
 
 ```bash
 python manage.py createsuperuser
@@ -84,7 +84,7 @@ npm install
 npm start
 ```
 
-It typically runs on http://localhost:3000. Adjust the backend endpoints accordingly to communicate with http://127.0.0.1:8000/api/....
+It typically runs on http://localhost:3000. Adjust the backend endpoints accordingly to communicate with http://127.0.0.1:8000/api/
 
 ## 4. App Navigation
 
@@ -97,10 +97,11 @@ Existing users can log in to access protected features
 
 Browse a list of handcrafted items.
 See item details, price, and seller information.
-Managing Items
 
-Authenticated sellers can create, edit, and delete items.
-View your own items in “My Items” section.
+### Managing Items
+
+Authenticated users can create, edit, and delete their own items.
+View your items in “My Items” section.
 
 ### Cart & Checkout
 
@@ -111,7 +112,8 @@ The cart can be accessed at /cart or /api/cart/.
 
 Update profile details, including address, phone number, bio, or profile picture.
 Edit profile page found at /profile/:id/edit_profile.
-Logout
+
+### Logout
 
 Clears the user’s session or JWT token from localStorage/SessionStorage, returning them to a public view.
 
@@ -124,14 +126,19 @@ Permission Checks: Only owners or staff can modify items. Public users can brows
 ## 6. Built With
 
 Django – Core backend framework for the project.
+
 Django REST Framework – Creates a robust, flexible API for item and cart endpoints.
+
 SimpleJWT – Handles JWT authentication for secure user sessions.
+
 React – Used for a single-page frontend experience.
+
 SQLite – Excellent choice for lightweight, relational DB that scales well with complex modeling.
+
 
 ## 7. Contributing
 
-Bug reports and pull requests are welcome. This project aims to provide a friendly, collaborative environment, and contributors are expected to adhere to the Contributor Covenant code of conduct. I built this as a fun project to learn Python, and freshen up my skills with React.
+Bug reports and pull requests are welcome. This project aims to provide a friendly, collaborative environment, and contributors are expected to adhere to the Contributor Covenant code of conduct. I built this as a fun way to learn Python, and freshen up my skills with React.
 
 ## 8. Authors
 
