@@ -1,11 +1,43 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // for navigation in React
-// If you have authentication info, you'd get it from context or a global state
-// e.g., const { user, isAuthenticated } = useAuth(); (just an example)
-const isAuthenticated = false; // Replace with real auth logic
-const userId = 1; // Replace with actual user ID from auth context or state
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace('-', '+').replace('_', '/');
+    return JSON.parse(window.atob(base64));
+  } catch (error) {
+    return null;
+  }
+}
 
 function Layout({ children }) {
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+      const payload = parseJwt(token);
+      if (payload) {
+        // Adjust depending on if JWT has a different field name for user ID, e.g. "sub" or "user_id"
+        setUserId(payload.user_id || payload.sub || null);
+      }
+    } else {
+      setIsAuthenticated(false);
+      setUserId(null);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setUserId(null);
+    navigate('/login');
+  };
+
   return (
     <div>
       <header>
@@ -18,9 +50,21 @@ function Layout({ children }) {
               <>
                 <li><Link to="/cart">My Cart</Link></li>
                 <li><Link to="/items">My Items for Sale</Link></li>
-                <li><Link to={`/profile/${userId}`}>Edit Profile</Link></li>
-                <li><Link to={`/delete_user/${userId}`}>Delete Account</Link></li>
-                <li><Link to="/logout">Logout</Link></li>
+                {userId && (
+                  <>
+                    <li><Link to={`/profile/${userId}`}>Edit Profile</Link></li>
+                    <li><Link to={`/delete_user/${userId}`}>Delete Account</Link></li>
+                  </>
+                )}
+                <li>
+                  {/* Instead of a <Link> for logout, use a button or onClick */}
+                  <button 
+                    onClick={handleLogout}
+                    className="px-3 py-1 bg-red-600 text-white rounded"
+                  >
+                    Logout
+                  </button>
+                </li>
               </>
             ) : (
               <>

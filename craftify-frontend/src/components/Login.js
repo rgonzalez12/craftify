@@ -33,7 +33,7 @@ function Login() {
       if (response.data.access) {
         localStorage.setItem('token', response.data.access);
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
-        navigate('/dashboard');
+        navigate('/');
       }
     } catch (err) {
       console.error('Login error:', err.response?.data);
