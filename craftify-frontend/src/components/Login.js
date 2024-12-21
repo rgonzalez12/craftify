@@ -26,7 +26,7 @@ function Login() {
 
     try {
       const response = await axios.post('http://localhost:8000/api/token/', {
-        username: formData.username,
+        email: formData.username,
         password: formData.password
       });
 

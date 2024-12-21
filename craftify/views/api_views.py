@@ -26,11 +26,12 @@ class TokenObtainPairView(TokenObtainPairView):
     permission_classes = [AllowAny]        
 
 class SignupView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         username = request.data.get('username')
         password = request.data.get('password')
-
+        print('email', 'username')
         if not email or not username or not password:
             return Response({'error': 'email, username, and password are required'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -41,7 +42,7 @@ class SignupView(APIView):
         user = User.objects.create(
             username=username,
             email=email,
-            password=make_password
+            password=make_password(password)
         )
         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
