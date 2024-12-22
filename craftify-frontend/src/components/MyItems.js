@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-// Helper to parse a JWT and extract payload data (like user_id)
 function parseJwt(token) {
   try {
     const base64Url = token.split('.')[1];
@@ -14,35 +13,33 @@ function parseJwt(token) {
 }
 
 function MyItems() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Extract user ID from the token stored in localStorage.
+  // Retrieve and parse the JWT token from localStorage
   const token = localStorage.getItem('token');
   let userId = null;
   if (token) {
     const payload = parseJwt(token);
-    userId = payload?.user_id || payload?.sub || null;
+    userId = payload?.user_id || payload?.sub || null; 
   }
 
-  // Fetch items once, then filter to only show the user’s own items
+  // If there's no userId, redirect to /login
   useEffect(() => {
+    if (!userId) {
+      navigate('/login');
+      return; // Stop here to avoid calling items API for unauthenticated user
+    }
+
     api.get('items/')
       .then(response => {
-        if (userId) {
-          // Filter by comparing item.seller (the seller_id) to userId
-          const userItems = response.data.filter(item => item.seller === userId);
-          setItems(userItems);
-        } else {
-          // If not logged in or no userId, we can show an empty list for "My Items"
-          setItems([]);
-        }
+        const userItems = response.data.filter(item => item.seller === userId);
+        setItems(userItems);
         setLoading(false);
       })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, [userId]);
+      .catch(() => setLoading(false));
+  }, [userId, navigate]);
 
   function handleDelete(id) {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
