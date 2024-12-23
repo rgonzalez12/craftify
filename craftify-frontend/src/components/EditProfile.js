@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 
 function EditProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const { isAuthenticated, userId } = useContext(AuthContext);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -24,10 +28,21 @@ function EditProfile() {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (parseInt(id) !== userId) {
+      setError('You are not authorized to edit this profile.');
+      setIsLoading(false);
+      return;
+    }
+
     const fetchUserData = async () => {
       setIsLoading(true);
       try {
-        const response = await api.get(`user/${id}/`);
+        const response = await api.get(`user/${id}/`); 
         const user = response.data;
         setFormData({
           bio: user.bio || '',
@@ -36,7 +51,8 @@ function EditProfile() {
           email: user.email || '',
           countryCode: user.country_code || '',
           address: user.address || '',
-          phoneNumber: user.phone_number || ''
+          phoneNumber: user.phone_number || '',
+          profilePicture: null // can't populate file inputs by default
         });
       } catch (err) {
         setError('Error fetching user data.');
@@ -47,7 +63,7 @@ function EditProfile() {
     };
 
     fetchUserData();
-  }, [id]);
+  }, [id, isAuthenticated, userId, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -124,8 +140,9 @@ function EditProfile() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  // If we already found an auth error (user isn't owner) or DB error
   if (error) return <div>Error: {error}</div>;
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -142,6 +159,7 @@ function EditProfile() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Profile Information */}
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Profile Information</h2>
           
@@ -197,6 +215,7 @@ function EditProfile() {
           </div>
         </div>
 
+        {/* Contact Information */}
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Contact Information</h2>
           
