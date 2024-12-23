@@ -18,7 +18,7 @@ function Layout({ children }) {
                 <li><Link to="/items">My Items</Link></li>
                 {userId && (
                   <>
-                    <li><Link to={`/profile/${userId}`}>Edit Profile</Link></li>
+                    <li><Link to={`/profile/${userId}/edit`}>Edit Profile</Link></li>
                     <li><Link to={`/delete_user/${userId}`}>Delete Account</Link></li>
                   </>
                 )}
