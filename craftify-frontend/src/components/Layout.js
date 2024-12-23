@@ -16,6 +16,7 @@ function Layout({ children }) {
             {isAuthenticated ? (
               <>
                 <li><Link to="/items">My Items</Link></li>
+                <li><Link to="/cart">My Cart</Link></li>
                 {userId && (
                   <>
                     <li><Link to={`/profile/${userId}/edit`}>Edit Profile</Link></li>
