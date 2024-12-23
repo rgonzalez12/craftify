@@ -31,7 +31,6 @@ function ItemDetail() {
       })
       .catch(error => {
         if (error.response && error.response.data && error.response.data.errors) {
-          // If the server returns validation errors in a known format
           setErrors(error.response.data.errors.quantity || ['Error adding item to cart.']);
         } else {
           setErrors(['Error adding item to cart.']);

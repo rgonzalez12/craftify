@@ -1,37 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace('-', '+').replace('_', '/');
-    return JSON.parse(window.atob(base64));
-  } catch (error) {
-    return null;
-  }
-}
+import { AuthContext } from '../context/AuthContext';
 
 function MyItems() {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated, userId } = useContext(AuthContext);
 
-  // Retrieve and parse the JWT token from localStorage
-  const token = localStorage.getItem('token');
-  let userId = null;
-  if (token) {
-    const payload = parseJwt(token);
-    userId = payload?.user_id || payload?.sub || null; 
-  }
-
-  // If there's no userId, redirect to /login
   useEffect(() => {
-    if (!userId) {
+    // If user is not authenticated, redirect to /login
+    if (!isAuthenticated || !userId) {
       navigate('/login');
-      return; // Stop here to avoid calling items API for unauthenticated user
+      return;
     }
 
+    // Otherwise fetch items and filter by userId
     api.get('items/')
       .then(response => {
         const userItems = response.data.filter(item => item.seller === userId);
@@ -39,7 +24,7 @@ function MyItems() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [userId, navigate]);
+  }, [isAuthenticated, userId, navigate]);
 
   function handleDelete(id) {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
