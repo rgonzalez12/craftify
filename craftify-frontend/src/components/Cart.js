@@ -1,52 +1,112 @@
-import React, { useEffect, useState } from 'react';
-import api from '../services/api';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 
 function Cart() {
-  const [cart, setCart] = useState(null);
   const navigate = useNavigate();
+  const { isAuthenticated } = useContext(AuthContext);
 
+  // Define Hooks at top level (unconditionally)
+  const [cart, setCart] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // useEffect: If not authenticated, navigate away
+  // Otherwise, fetch the cart
   useEffect(() => {
-    api.get('cart/')
-      .then(response => {
-        setCart(response.data);
-      })
-      .catch(() => {
-        console.error('Error fetching cart data');
-      });
-  }, []);
+    if (!isAuthenticated) {
+      navigate('/login');
+      return; // skip fetching if not logged in
+    }
 
-  function handleRemoveItem(itemId) {
-    api.delete(`cart/items/${itemId}/`) // Adjust the endpoint if needed
-      .then(() => {
-        setCart(prevCart => {
-          return {
-            ...prevCart,
-            items: prevCart.items.filter(i => i.item.id !== itemId)
-          };
-        });
-      })
-      .catch(() => {
-        console.error('Error removing item');
+    async function fetchCart() {
+      try {
+        setLoading(true);
+        const response = await api.get('cart/');
+        setCart(response.data);
+      } catch (err) {
+        console.error('Error fetching cart data:', err);
+        setError('Unable to fetch cart at this time.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCart();
+  }, [isAuthenticated, navigate]);
+
+  // Remove item from cart
+  async function handleRemoveItem(itemId) {
+    try {
+      await api.delete(`cart/items/${itemId}/`);
+      setCart((prevCart) => {
+        if (!prevCart) return prevCart;
+        return {
+          ...prevCart,
+          items: prevCart.items.filter((ci) => ci.item.id !== itemId),
+        };
       });
+    } catch (err) {
+      console.error('Error removing item:', err);
+      setError('Failed to remove item. Please try again.');
+    }
   }
+
+  // Go to checkout
   function handleCheckout() {
     navigate('/checkout');
   }
-  if (cart === null) {
-    return <p>Loading your cart...</p>;
+
+  // Now do final returns (we do not call hooks conditionally)
+  if (!isAuthenticated) {
+    // We already navigated to /login in the useEffect, 
+    // but this guard prevents a brief render of the cart for unauthenticated users.
+    return null;
   }
 
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <p className="text-gray-700">Loading your cart...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  // If cart is null or cart.items is undefined, treat as empty
+  if (!cart || !cart.items) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Your Cart</h2>
+        <p className="text-gray-600">Your cart is empty.</p>
+      </div>
+    );
+  }
+
+  const totalPrice = cart.items.reduce(
+    (acc, ci) => acc + ci.quantity * ci.item.price,
+    0
+  );
+
   return (
-    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto py-8 px-4">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Your Cart</h2>
-      {cart.items && cart.items.length > 0 ? (
+
+      {cart.items.length > 0 ? (
         <>
-          <ul className="cart-items space-y-4 bg-white rounded-lg p-6 shadow-md">
+          <ul className="space-y-4 bg-white rounded-lg p-6 shadow-md">
             {cart.items.map((cartItem) => (
-              <li 
-                key={cartItem.item.id} 
-                className="cart-item flex items-center justify-between border-b border-gray-200 pb-4"
+              <li
+                key={cartItem.item.id}
+                className="flex items-center justify-between border-b border-gray-200 pb-4"
               >
                 <div className="flex flex-col">
                   <span className="text-lg font-semibold text-gray-800">
@@ -70,9 +130,10 @@ function Cart() {
               </li>
             ))}
           </ul>
+
           <div className="flex items-center justify-between mt-6">
-            <p className="cart-total text-xl font-bold text-gray-800">
-              Total: ${cart.items.reduce((acc, ci) => acc + ci.quantity * ci.item.price, 0)}
+            <p className="text-xl font-bold text-gray-800">
+              Total: ${totalPrice.toFixed(2)}
             </p>
             <button
               onClick={handleCheckout}
