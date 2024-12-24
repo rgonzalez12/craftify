@@ -6,8 +6,6 @@ import { AuthContext } from '../context/AuthContext';
 function Cart() {
   const navigate = useNavigate();
   const { isAuthenticated } = useContext(AuthContext);
-
-  // Define Hooks at top level (unconditionally)
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
