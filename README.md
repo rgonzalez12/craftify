@@ -1,6 +1,6 @@
 # Craftify
 
-Craftify is an e-commerce platform designed to showcase and sell handcrafted items. Built with Django on the backend, combined with React for the frontend, Craftify provides robust user creation, custom user profiles, item management, cart functionality, and so much more.
+Craftify is an e-commerce platform designed to showcase and sell handcrafted items. Built with Django on the backend, combined with React for the frontend, Craftify provides robust user creation, custom user profiles, item management, cart functionality, and so much more. I built this as a fun way to learn Python, and freshen up my skills with React.
 
 ## Table of Contents
 
@@ -135,7 +135,7 @@ SQLite – Excellent choice for lightweight, relational DB that scales well with
 
 ## 7. Contributing
 
-Bug reports and pull requests are welcome. This project aims to provide a friendly, collaborative environment, and contributors are expected to adhere to the Contributor Covenant code of conduct. I built this as a fun way to learn Python, and freshen up my skills with React.
+Bug reports and pull requests are welcome. This project aims to provide a friendly, collaborative environment, and contributors are expected to adhere to the Contributor Covenant code of conduct.
 
 ## 8. Authors
 
