@@ -10,8 +10,6 @@ function Cart() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // useEffect: If not authenticated, navigate away
-  // Otherwise, fetch the cart
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');

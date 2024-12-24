@@ -31,7 +31,6 @@ function ItemDetail() {
       });
   }, [id]);
 
-  // Handle Add to Cart
   async function handleAddToCart(e) {
     e.preventDefault();
     setErrors([]);
@@ -42,12 +41,6 @@ function ItemDetail() {
       setErrors(['You must be logged in to add items to the cart.']);
       return;
     }
-
-    // (Optional) Prevent user from adding their own item to the cart
-    // if (item?.seller?.id === userId) {
-    //   setErrors(["You can't buy your own item."]);
-    //   return;
-    // }
 
     const data = { quantity: parseInt(quantity, 10) };
 

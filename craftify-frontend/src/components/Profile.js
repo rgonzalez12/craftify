@@ -24,30 +24,23 @@ function Profile() {
     // Fetch user, items, and comments
     async function fetchProfileData() {
       try {
-        // 1) Fetch user info
         const userResp = await api.get(`user/${id}/`);
         setProfileUser(userResp.data);
 
-        // 2) Fetch items: if your API has a dedicated /api/user/:id/items/ endpoint,
-        //    use that. Otherwise, fetch all items and filter:
         const itemsResp = await api.get('items/');
         const userItems = itemsResp.data.filter(
           (item) => item.seller === parseInt(id, 10)
         );
         setItems(userItems);
 
-        // 3) Fetch comments: if 404, we handle it gracefully
         try {
           const commentsResp = await api.get(`user/${id}/comments/`);
           setComments(commentsResp.data);
         } catch (err) {
           if (err.response && err.response.status === 404) {
-            // If the endpoint doesn't exist or there's no comments, just set an empty array
             setComments([]);
           } else {
-            // Some other error
             console.error('Error fetching comments:', err);
-            // We won't set an error that kills the page; just show no comments
             setComments([]);
           }
         }

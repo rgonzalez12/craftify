@@ -16,6 +16,7 @@ function parseJwt(token) {
 export function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // On initial load, check localStorage for an existing token
   useEffect(() => {
@@ -24,6 +25,7 @@ export function AuthProvider({ children }) {
       const payload = parseJwt(token);
       setUserId(payload?.user_id || payload?.sub || null);
     }
+    setAuthLoading(false);
   }, []);
 
   function login(token) {
@@ -41,7 +43,9 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!userId;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userId, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, userId, authLoading, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

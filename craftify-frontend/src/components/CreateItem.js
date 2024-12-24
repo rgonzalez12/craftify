@@ -6,8 +6,6 @@ import { AuthContext } from '../context/AuthContext';
 function CreateItem() {
   const navigate = useNavigate();
   const { isAuthenticated } = useContext(AuthContext);
-
-  // Hooks MUST be at the top:
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('1');
@@ -16,7 +14,6 @@ function CreateItem() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Then do the conditional check below:
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -49,8 +46,6 @@ function CreateItem() {
     }
   }
 
-  // If not authenticated, we can return null or a loading spinner
-  // The useEffect above already navigates away, but let's guard anyway:
   if (!isAuthenticated) {
     return null;
   }

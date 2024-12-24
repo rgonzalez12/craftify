@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // <- get the login function from context
+  const { login } = useContext(AuthContext); // <- using my global context
 
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
