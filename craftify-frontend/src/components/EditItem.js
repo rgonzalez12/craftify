@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../services/api'; // your axios instance
+import api from '../services/api';
 
 function EditItem() {
   const { id } = useParams();          // Get the item id from URL params
@@ -11,7 +11,6 @@ function EditItem() {
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('');
   const [category, setCategory] = useState('');
-  // If you have image handling, you'd track it here as well
   // const [image, setImage] = useState(null);
 
   useEffect(() => {
@@ -24,7 +23,6 @@ function EditItem() {
         setPrice(item.price || '');
         setQuantity(item.quantity || '');
         setCategory(item.category || '');
-        // If image is provided by the API, handle it accordingly.
       })
       .catch(() => alert('Error fetching item data.'));
   }, [id]);
@@ -43,7 +41,7 @@ function EditItem() {
     api.put(`items/${id}/`, data)
       .then(() => {
         alert('Item updated successfully.');
-        navigate('/items'); // redirect back to items list or wherever you prefer
+        navigate('/items');
       })
       .catch(() => alert('Error updating item.'));
   }
@@ -115,7 +113,7 @@ function EditItem() {
           />
         </div>
 
-        {/* If you have an image field:
+        {/*image field:
         <div className="flex flex-col">
           <label className="mb-1 font-semibold text-gray-700">Image</label>
           <input

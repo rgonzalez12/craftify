@@ -28,15 +28,12 @@ function Home() {
             {items.map(item => (
               <div key={item.id} className="item-card">
                 <h3>{item.name}</h3>
-                {/* React doesn't have a built-in filter like Django,
-                    you can write a small helper function or inline logic. */}
                 <p>
                   {item.description.split(' ').slice(0,20).join(' ')}
                   {item.description.split(' ').length > 20 ? '...' : ''}
                 </p>
                 <p>Price: ${item.price}</p>
                 <p>Seller: {item.seller.username}</p>
-                {/* Use React Router's Link for navigation */}
                 <Link to={`/items/${item.id}`} className="button">View Item</Link>
               </div>
             ))}
