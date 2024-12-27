@@ -12,6 +12,7 @@ import Cart from './components/Cart';
 import Profile from './components/Profile';
 import EditProfile from './components/EditProfile';
 import DeleteUser from './components/DeleteUser';
+import Checkout from './components/Checkout';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/profile/:id/edit" element={<EditProfile />} />
         <Route path="/delete_user/:id" element={<DeleteUser />} />
+        <Route path="/checkout" element={<Checkout />} />
       </Routes>
     </Layout>
   );
