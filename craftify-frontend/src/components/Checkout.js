@@ -7,9 +7,7 @@ function Checkout() {
   const navigate = useNavigate();
   const { isAuthenticated, authLoading } = useContext(AuthContext);
 
-  // Cart items
   const [cart, setCart] = useState(null);
-  // Loading & error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -34,15 +32,16 @@ function Checkout() {
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCVC, setCardCVC] = useState('');
 
-  // Success or error messages
+  // Success
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    if (authLoading) return; // Wait for auth to finish
+    if (authLoading) return; 
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
+
     async function fetchCart() {
       try {
         setLoading(true);
@@ -68,22 +67,12 @@ function Checkout() {
     setError('');
     setSuccessMessage('');
 
+    // Basic field check
     if (
-      !billingName ||
-      !billingAddress ||
-      !billingCity ||
-      !billingState ||
-      !billingZip ||
-      !billingCountry ||
-      !shippingName ||
-      !shippingAddress ||
-      !shippingCity ||
-      !shippingState ||
-      !shippingZip ||
-      !shippingCountry ||
-      !cardNumber ||
-      !cardExpiry ||
-      !cardCVC
+      !billingName || !billingAddress || !billingCity || !billingState ||
+      !billingZip || !billingCountry || !shippingName || !shippingAddress ||
+      !shippingCity || !shippingState || !shippingZip || !shippingCountry ||
+      !cardNumber || !cardExpiry || !cardCVC
     ) {
       setError('Please fill in all required fields.');
       return;
@@ -114,18 +103,12 @@ function Checkout() {
         },
       };
 
-      // 1. Send checkout data
-      await api.post('checkout/', payload);
+      // 1) Send checkout data to backend: expects an order object in response
+      const response = await api.post('checkout/', payload);
+      // e.g., response.data = { orderId, items, shipping, payment, ... }
 
-      // 2. Clear the cart in the backend
-      // We can skip or just re-fetch cart
-      await api.delete('cart/');  // or a custom `cart/clear/` endpoint maybe at somepoint if Django will handle this
-
-      setSuccessMessage('Payment processed! Your order has been placed and cart is now empty.');
-
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+      // 2) Navigate to OrderConfirmed, pass the order data in location.state
+      navigate('/order-confirmed', { state: { order: response.data } });
 
     } catch (err) {
       console.error('Checkout error:', err);
@@ -162,7 +145,7 @@ function Checkout() {
     <div className="container mx-auto px-4 py-8 space-y-8">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Checkout</h2>
 
-      {/* CART ITEMS REVIEW */}
+      {/* CART ITEMS */}
       <div className="bg-white p-6 rounded shadow-md">
         <h3 className="text-xl font-semibold mb-4 text-gray-800">
           Review Your Items
@@ -207,9 +190,7 @@ function Checkout() {
         <form onSubmit={handleCheckout} className="space-y-6">
           {/* Billing Info */}
           <div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-800">
-              Billing Address
-            </h3>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800">Billing Address</h3>
             <div className="bg-gray-50 p-4 rounded space-y-4">
               <div>
                 <label className="block mb-1 font-medium text-gray-700">
@@ -290,9 +271,7 @@ function Checkout() {
 
           {/* Shipping Info */}
           <div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-800">
-              Shipping Address
-            </h3>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800">Shipping Address</h3>
             <div className="bg-gray-50 p-4 rounded space-y-4">
               <div>
                 <label className="block mb-1 font-medium text-gray-700">
@@ -373,9 +352,7 @@ function Checkout() {
 
           {/* Payment Info */}
           <div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-800">
-              Payment Info
-            </h3>
+            <h3 className="text-xl font-semibold mb-2 text-gray-800">Payment Info</h3>
             <div className="bg-gray-50 p-4 rounded space-y-4">
               <div>
                 <label className="block mb-1 font-medium text-gray-700">
