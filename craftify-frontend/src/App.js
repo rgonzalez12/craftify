@@ -13,6 +13,7 @@ import Profile from './components/Profile';
 import EditProfile from './components/EditProfile';
 import DeleteUser from './components/DeleteUser';
 import Checkout from './components/Checkout';
+import MyOrders from './components/MyOrders';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/profile/:id/edit" element={<EditProfile />} />
         <Route path="/delete_user/:id" element={<DeleteUser />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/myorders" element={<MyOrders />} />
       </Routes>
     </Layout>
   );
