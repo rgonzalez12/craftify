@@ -6,7 +6,6 @@ import api from '../services/api';
 function Checkout() {
   const navigate = useNavigate();
   const { isAuthenticated, authLoading } = useContext(AuthContext);
-
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
