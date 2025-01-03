@@ -14,6 +14,7 @@ import EditProfile from './components/EditProfile';
 import DeleteUser from './components/DeleteUser';
 import Checkout from './components/Checkout';
 import MyOrders from './components/MyOrders';
+import Users from './components/Users';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/users" element={<Users />} />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/profile/:id/edit" element={<EditProfile />} />
         <Route path="/delete_user/:id" element={<DeleteUser />} />

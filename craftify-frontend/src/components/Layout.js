@@ -12,7 +12,7 @@ function Layout({ children }) {
         <nav>
           <ul className="flex space-x-4">
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/users">Seller List</Link></li>
+            <li><Link to="/users">Merchant Directory</Link></li>
             {isAuthenticated ? (
               <>
                 <li><Link to="/items">My Items</Link></li>
