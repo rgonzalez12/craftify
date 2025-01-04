@@ -37,7 +37,7 @@ function OrderConfirmed() {
       await api.delete('cart/');
     } catch (err) {
       console.error('Error clearing cart:', err);
-      // We won't block navigation if cart clearing fails, but we could add UI feedback
+      // We won't block navigation if cart clearing fails, but we could add UI feedback at some point
     }
     navigate('/');
   }

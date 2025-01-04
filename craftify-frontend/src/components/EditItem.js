@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 function EditItem() {
-  const { id } = useParams();          // Get the item id from URL params
+  const { id } = useParams();  // Get the item id from URL params
   const navigate = useNavigate();
   
   const [name, setName] = useState('');
@@ -35,7 +35,7 @@ function EditItem() {
       price: parseFloat(price),
       quantity: parseInt(quantity, 10),
       category
-      // If image upload is needed, handle FormData or the image field separately.
+      // When image upload is needed, handle FormData or the image field separately.
     };
 
     api.put(`items/${id}/`, data)

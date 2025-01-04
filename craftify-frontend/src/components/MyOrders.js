@@ -25,7 +25,7 @@ function MyOrders() {
     setLoading(true);
     setError('');
     try {
-      // We'll assume we can pass a query param ?days=XX to get orders within XX days
+      // We can pass a query param ?days=XX to get orders within XX days
       const response = await api.get(`orders/?days=${days}`);
       setOrders(response.data);
     } catch (err) {

@@ -45,7 +45,7 @@ function ItemDetail() {
     const data = { quantity: parseInt(quantity, 10) };
 
     try {
-      // Ensure we have the trailing slash if Django requires it
+      // Ensures we have the trailing slash in the URL
       await api.post(`cart/add/${id}/`, data);
       setMessages(['Item added to cart successfully.']);
 

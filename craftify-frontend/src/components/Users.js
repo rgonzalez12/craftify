@@ -43,7 +43,7 @@ function Users() {
   }
 
   // Create a small array of page numbers
-  // If totalPages is large, I might consider only show a subset.
+  // If totalPages is large, I might consider only showing a subset.
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);

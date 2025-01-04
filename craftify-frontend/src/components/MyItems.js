@@ -15,7 +15,6 @@ function MyItems() {
       navigate('/login');
       return;
     }
-
     // Otherwise fetch items and filter by userId
     api.get('items/')
       .then(response => {
