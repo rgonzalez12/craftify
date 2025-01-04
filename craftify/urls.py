@@ -21,6 +21,7 @@ router.register(r'order-items', PurchaseOrderItemViewSet)
 
 api_urlpatterns = [
     path('', include(router.urls)),
+    path('cart/add/<int:item_id>/', CartViewSet.as_view({'post': 'add_to_cart'}), name='cart-add-item'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('signup/', SignupView.as_view(), name='api_signup'),

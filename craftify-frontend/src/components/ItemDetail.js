@@ -1,145 +1,125 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import api from '../services/api';
-import { AuthContext } from '../context/AuthContext';
 
 function ItemDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, userId } = useContext(AuthContext);
+  const { isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
 
   const [item, setItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    setErrors([]);
-    setMessages([]);
-
     api.get(`items/${id}/`)
-      .then((response) => {
+      .then(response => {
         setItem(response.data);
       })
-      .catch(() => {
+      .catch(error => {
         setErrors(['Error fetching item details.']);
+        console.error('Error:', error);
       })
       .finally(() => {
         setLoading(false);
       });
   }, [id]);
 
-  async function handleAddToCart(e) {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     setErrors([]);
     setMessages([]);
 
-    // If not authenticated, let the user know they need to log in
     if (!isAuthenticated) {
-      setErrors(['You must be logged in to add items to the cart.']);
+      setErrors(['You must be logged in to add items to cart.']);
       return;
     }
 
-    const data = { quantity: parseInt(quantity, 10) };
-
     try {
-      // Ensures we have the trailing slash in the URL
-      await api.post(`cart/add/${id}/`, data);
-      setMessages(['Item added to cart successfully.']);
-
-      // Redirect to cart page after a short delay
-      setTimeout(() => {
-        navigate('/cart');
-      }, 800);
-
-    } catch (error) {
-      if (error.response && error.response.data?.errors) {
-        setErrors(error.response.data.errors.quantity || ['Error adding item to cart.']);
-      } else {
-        setErrors(['Error adding item to cart.']);
+      const success = await addToCart(id, parseInt(quantity));
+      if (success) {
+        setMessages(['Item added to cart successfully']);
+        setTimeout(() => navigate('/cart'), 800);
       }
+    } catch (error) {
+      setErrors(['Error adding item to cart. Please try again.']);
     }
-  }
+  };
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <p className="text-gray-700">Loading item details...</p>
-      </div>
-    );
-  }
-
-  if (!item) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <p className="text-red-500">Item not found or an error occurred.</p>
-      </div>
-    );
-  }
+  if (loading) return <div>Loading...</div>;
+  if (!item) return <div>Item not found</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      {/* Item Details */}
-      <div className="bg-white shadow-md rounded p-6">
-        <h2 className="text-2xl font-bold text-gray-800">{item.name}</h2>
-        <p className="text-gray-700 mt-4">
-          {item.description || 'No description provided.'}
-        </p>
-        <p className="mt-2 text-gray-800">
-          <span className="font-semibold">Price:</span> ${item.price}
-        </p>
-        <p className="mt-2 text-gray-600">
-          <span className="font-semibold">Seller:</span>{' '}
-          {item.seller?.username || 'Unknown Seller'}
-        </p>
-      </div>
-
+    <div className="max-w-2xl mx-auto p-4">
       {/* Error Messages */}
       {errors.length > 0 && (
-        <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded">
-          {errors.map((err, i) => (
-            <p key={i} className="mb-1">
-              {err}
-            </p>
-          ))}
-        </div>
-      )}
-      {/* Success Messages */}
-      {messages.length > 0 && (
-        <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded">
-          {messages.map((msg, i) => (
-            <p key={i} className="mb-1">
-              {msg}
-            </p>
+        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded mb-4">
+          {errors.map((error, i) => (
+            <p key={i} className="mb-1">{error}</p>
           ))}
         </div>
       )}
 
-      {/* Add to Cart Form */}
-      <div className="bg-white shadow-md rounded p-6">
-        <form onSubmit={handleAddToCart} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-semibold text-gray-700">
-              Quantity:
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Add to Cart
-          </button>
-        </form>
+      {/* Success Messages */}
+      {messages.length > 0 && (
+        <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded mb-4">
+          {messages.map((msg, i) => (
+            <p key={i} className="mb-1">{msg}</p>
+          ))}
+        </div>
+      )}
+
+      {/* Item Details */}
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+        {item.image && (
+          <img 
+            src={item.image} 
+            alt={item.name}
+            className="w-full h-64 object-cover"
+          />
+        )}
+        
+        <div className="p-6">
+          <h1 className="text-2xl font-bold mb-2">{item.name}</h1>
+          <p className="text-gray-600 mb-4">{item.description}</p>
+          <p className="text-xl font-bold text-green-600 mb-4">
+            ${item.price}
+          </p>
+
+          {/* Add to Cart Form */}
+          <form onSubmit={handleAddToCart} className="space-y-4">
+            <div>
+              <label className="block mb-1 font-semibold text-gray-700">
+                Quantity:
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+                required
+              />
+            </div>
+            
+            <button
+              type="submit"
+              disabled={!isAuthenticated}
+              className={`w-full px-4 py-2 rounded font-semibold ${
+                isAuthenticated 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              {isAuthenticated ? 'Add to Cart' : 'Please Login to Add to Cart'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

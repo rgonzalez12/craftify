@@ -56,40 +56,45 @@ class ItemViewSet(viewsets.ModelViewSet):
             
         return Response({'status': 'Item added to cart'})
 
-class CartViewSet(BaseModelViewSet):
+class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
 
-    @action(detail=True, methods=['post'])
-    def checkout(self, request, pk=None):
-        cart = self.get_object()
-        if not cart.items.exists():
+    @action(detail=False, methods=['post'])
+    def add_to_cart(self, request, item_id=None):
+        try:
+            item = Item.objects.get(id=item_id)
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            quantity = int(request.data.get('quantity', 1))
+
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                item=item,
+                defaults={'quantity': quantity}
+            )
+
+            if not created:
+                cart_item.quantity += quantity
+                cart_item.save()
+
+            return Response({
+                'message': 'Item added to cart successfully',
+                'cart_item': CartItemSerializer(cart_item).data
+            }, status=status.HTTP_200_OK)
+
+        except Item.DoesNotExist:
             return Response(
-                {'error': 'Cart is empty'},
+                {'error': 'Item not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        purchase_order = PurchaseOrder.objects.create(
-            buyer=request.user,
-            status='pending'
-        )
-
-        for cart_item in cart.items.all():
-            PurchaseOrderItem.objects.create(
-                purchase_order=purchase_order,
-                item=cart_item.item,
-                quantity=cart_item.quantity,
-                price=cart_item.item.price
-            )
-
-        cart.items.all().delete()
-        return Response(
-            PurchaseOrderSerializer(purchase_order).data,
-            status=status.HTTP_201_CREATED
-        )
 
 class PurchaseOrderViewSet(BaseModelViewSet):
     queryset = PurchaseOrder.objects.all()
