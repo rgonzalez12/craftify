@@ -17,6 +17,7 @@ function Layout({ children }) {
               <>
                 <li><Link to="/items">My Items</Link></li>
                 <li><Link to="/cart">My Cart</Link></li>
+                <li><Link to="/myorders">My Orders</Link></li>
                 {userId && (
                   <>
                     <li><Link to={`/profile/${userId}/edit`}>Edit Profile</Link></li>
