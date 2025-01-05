@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 function Users() {
-  // I store users, pagination data (like total pages), and current page
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const pageSize = 20;
+  const pageSize = 10; // Changed to 10 users per page
 
   useEffect(() => {
     fetchUsers(currentPage);
@@ -20,146 +19,126 @@ function Users() {
     setLoading(true);
     setError('');
     try {
-      // backend uses query param ?page=1
-      // optional support for /api/users/?page=1&page_size=20:
-      const response = await api.get(`users/?page=${page}`);
-      // response.data = { count, results, next, previous }
-      setUsers(response.data.results);
-      setTotalCount(response.data.count);
+      const response = await api.get('/users/', {
+        params: {
+          page: page,
+          page_size: pageSize
+        },
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.data.results) {
+        setUsers(response.data.results);
+        setTotalCount(response.data.count);
+      }
     } catch (err) {
       console.error('Error fetching users:', err);
-      setError('Unable to load sellers. Please try again.');
+      setError(err.response?.data?.detail || 'Unable to load users. Please try again.');
     } finally {
       setLoading(false);
     }
   }
 
-  // Calculate total pages from count & pageSize
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  function handlePageChange(newPage) {
-    if (newPage < 1 || newPage > totalPages) return;
-    setCurrentPage(newPage);
-  }
-
-  // Create a small array of page numbers
-  // If totalPages is large, I might consider only showing a subset.
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <p className="text-gray-700">Loading sellers...</p>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <p className="text-red-500 mb-4">{error}</p>
+      <div className="text-center py-8">
+        <div className="text-red-600 mb-4">{error}</div>
+        <button 
+          onClick={() => fetchUsers(currentPage)}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800">All Sellers</h1>
-
-      {/* Sellers Grid */}
-      {users.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {users.map((user) => (
-            <div
-              key={user.id}
-              className="bg-white rounded shadow-md p-4 flex flex-col items-center"
-            >
-              {/* If user has a profile_picture field */}
-              {user.profile_picture ? (
-                <img
-                  src={user.profile_picture}
-                  alt={user.username}
-                  className="w-24 h-24 object-cover rounded-full mb-3"
-                />
-              ) : (
-                <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-3">
-                  <span className="text-gray-500">No Image</span>
-                </div>
-              )}
-
-              <h2 className="text-lg font-semibold text-gray-800">
-                {user.username}
-              </h2>
-              {/* Possibly user bio or short info */}
-              {user.bio && (
-                <p className="text-gray-600 text-center mt-2 text-sm line-clamp-3">
-                  {user.bio}
-                </p>
-              )}
-              {/* Link to user profile */}
-              <Link
-                to={`/profile/${user.id}`}
-                className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-              >
-                View Profile
-              </Link>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-gray-600">No sellers found.</p>
-      )}
-
-      {/* Pagination Bar */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-2 mt-6">
-          {/* Previous Button */}
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            className={`px-3 py-1 rounded ${
-              currentPage === 1
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-            disabled={currentPage === 1}
-          >
-            Prev
-          </button>
-
-          {/* Page Numbers (If you want direct page links) */}
-          <div className="space-x-1">
-            {pageNumbers.map((num) => (
-              <button
-                key={num}
-                onClick={() => handlePageChange(num)}
-                className={`px-3 py-1 rounded focus:outline-none ${
-                  num === currentPage
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 hover:bg-gray-200'
-                }`}
-              >
-                {num}
-              </button>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Users</h1>
+      
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                User
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="text-sm font-medium text-gray-900">
+                      {user.username}
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{user.email}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <Link 
+                    to={`/profile/${user.id}`}
+                    className="text-blue-600 hover:text-blue-900 mr-4"
+                  >
+                    View
+                  </Link>
+                </td>
+              </tr>
             ))}
-          </div>
+          </tbody>
+        </table>
+      </div>
 
-          {/* Next Button */}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            className={`px-3 py-1 rounded ${
-              currentPage === totalPages
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      )}
+      {/* Pagination */}
+      <div className="flex justify-center items-center space-x-2 mt-6">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+        >
+          Previous
+        </button>
+        
+        <span className="text-gray-600">
+          Page {currentPage} of {totalPages}
+        </span>
+        
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
