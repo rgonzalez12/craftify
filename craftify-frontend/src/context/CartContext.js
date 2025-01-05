@@ -14,10 +14,11 @@ export const CartProvider = ({ children }) => {
     if (!isAuthenticated) return;
     try {
       setLoading(true);
+      setError(null);
       const response = await api.get('cart/');
       setCart(response.data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Error fetching cart');
     } finally {
       setLoading(false);
     }
@@ -26,40 +27,46 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchCart();
+    } else {
+      setCart(null);
     }
   }, [isAuthenticated, fetchCart]);
 
   const addToCart = async (itemId, quantity) => {
     try {
+      setError(null);
       const response = await api.post(`cart/add/${itemId}/`, { quantity });
       setCart(response.data);
       return true;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Error adding item to cart');
       return false;
     }
   };
 
-  const removeFromCart = async (itemId) => {
+  const removeFromCart = async (cartItemId) => {
     try {
-      await api.delete(`cart/items/${itemId}/`);
+      setError(null);
+      await api.delete(`cart/items/${cartItemId}/`);
       await fetchCart();
       return true;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Error removing item from cart');
       return false;
     }
   };
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
-      loading, 
-      error, 
-      fetchCart, 
-      addToCart, 
-      removeFromCart 
-    }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        loading,
+        error,
+        fetchCart,
+        addToCart,
+        removeFromCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

@@ -1,43 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import api from '../services/api';
 
 function Cart() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const { cart, loading, error, removeFromCart, fetchCart } = useCart();
-  const [localError, setLocalError] = useState(null);
+  const { isAuthenticated, authLoading } = useAuth();
 
+  // from CartContext
+  const {
+    cart,
+    loading,
+    error,
+    removeFromCart,
+    fetchCart,
+  } = useCart();
+
+  // 1. Only fetch cart if user is authenticated
   useEffect(() => {
-    const getCartData = async () => {
-      try {
-        if (isAuthenticated) {
-          console.log('Fetching cart data...');
-          await fetchCart();
-          console.log('Cart data fetched:', cart);
-        }
-      } catch (err) {
-        console.error('Error fetching cart:', err);
-        setLocalError(err.message);
-      }
-    };
-
-    getCartData();
-  }, [isAuthenticated, fetchCart]);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
+    if (!authLoading && isAuthenticated) {
+      fetchCart();
+    }
+    // If not authenticated, we can redirect, but let's wait until authLoading is false
+    else if (!authLoading && !isAuthenticated) {
       navigate('/login');
     }
-  }, [isAuthenticated, navigate]);
+  }, [authLoading, isAuthenticated, fetchCart, navigate]);
 
-  console.log('Current cart state:', cart);
+  // 2. Handle removing item
+  //    Pass the *cart item* ID if your backend expects that
+  const handleRemoveItem = async (cartItemId) => {
+    try {
+      await removeFromCart(cartItemId);
+      // Optionally no need to re-fetch here because removeFromCart calls fetchCart
+    } catch (err) {
+      console.error('Error removing item:', err);
+    }
+  };
 
-  if (loading) return <div className="p-4">Loading cart...</div>;
-  if (localError) return <div className="p-4 text-red-600">Error: {localError}</div>;
-  if (!cart || !cart.items?.length) {
+  // 3. Render states
+  if (authLoading || loading) return <div>Loading cart...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  // 4. If the cart is empty or null
+  if (!cart || !cart.items || cart.items.length === 0) {
     return (
       <div className="max-w-2xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Shopping Cart</h1>
@@ -46,31 +52,25 @@ function Cart() {
     );
   }
 
-  const handleRemoveItem = async (itemId) => {
-    try {
-      console.log('Removing item:', itemId);
-      await removeFromCart(itemId);
-      await fetchCart();
-    } catch (err) {
-      console.error('Error removing item:', err);
-      setLocalError(err.message);
-    }
-  };
-
+  // 5. Display cart items
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Shopping Cart</h1>
-      
+
       {cart.items.map((cartItem) => (
         <div key={cartItem.id} className="flex items-center border-b py-4">
           <div className="ml-4 flex-grow">
-            <h3 className="font-semibold">{cartItem.item.name}</h3>
+            <h3 className="font-semibold">{cartItem.item?.name}</h3>
             <p className="text-gray-600">Quantity: {cartItem.quantity}</p>
-            <p className="text-green-600 font-semibold">${cartItem.total_price}</p>
+            <p className="text-green-600 font-semibold">
+              ${cartItem.item?.price * cartItem.quantity}
+            </p>
           </div>
 
           <button
-            onClick={() => handleRemoveItem(cartItem.item.id)}
+            // Instead of cartItem.item?.id, use cartItem.id
+            // if that's how your backend identifies the cart item
+            onClick={() => handleRemoveItem(cartItem.id)}
             className="text-red-600 hover:text-red-800"
           >
             Remove
@@ -79,8 +79,11 @@ function Cart() {
       ))}
 
       <div className="mt-4 text-right">
-        <p className="text-xl font-bold">Total: ${cart.total_price}</p>
-        <button 
+        <p className="text-xl font-bold">
+          {/* If your backend returns something like total_price, use that. Otherwise calculate here */}
+          Total: ${cart.total_price || 0}
+        </p>
+        <button
           onClick={() => navigate('/checkout')}
           className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
         >
