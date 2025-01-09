@@ -46,8 +46,8 @@ export const CartProvider = ({ children }) => {
 
     try {
       console.log(`Attempting to remove item ${itemId} from cart`);
-      // Changed to match your Django URL pattern exactly
-      const response = await api.delete(`cart/remove/${itemId}/`);
+      // Updated to match the Django ViewSet action URL pattern
+      const response = await api.delete(`cart/remove_from_cart/${itemId}/`);
       console.log('Remove cart response:', response);
 
       // Refresh cart after successful removal
@@ -58,7 +58,7 @@ export const CartProvider = ({ children }) => {
         message: err.message,
         status: err.response?.status,
         data: err.response?.data,
-        url: `cart/remove/${itemId}/` // Log the attempted URL for debugging
+        url: `cart/remove_from_cart/${itemId}/`
       });
       setError(err.message);
       return false;

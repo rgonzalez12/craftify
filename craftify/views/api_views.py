@@ -96,6 +96,36 @@ class CartViewSet(viewsets.ModelViewSet):
                 {'error': str(e)}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+    @action(detail=False, methods=['delete'])
+    def remove_from_cart(self, request, item_id=None):
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cart_item = CartItem.objects.get(
+            cart=cart,
+            item_id=item_id
+            )
+            cart_item.delete()
+            
+            return Response({
+                'message': 'Item removed from cart successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except Cart.DoesNotExist:
+            return Response(
+                {'error': 'Cart not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except CartItem.DoesNotExist:
+            return Response(
+                {'error': 'Item not found in cart'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 class PurchaseOrderViewSet(BaseModelViewSet):
     queryset = PurchaseOrder.objects.all()
