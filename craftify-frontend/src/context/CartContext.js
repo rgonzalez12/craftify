@@ -16,6 +16,7 @@ export const CartProvider = ({ children }) => {
       setCart(response.data);
       return response.data;
     } catch (err) {
+      console.error('Cart fetch error:', err);
       setError(err.message);
       return null;
     } finally {
@@ -25,21 +26,40 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (itemId, quantity) => {
     try {
+      console.log(`Adding item ${itemId} to cart with quantity ${quantity}`);
       const response = await api.post(`cart/add/${itemId}/`, { quantity });
+      console.log('Add to cart response:', response.data);
       setCart(response.data);
       return true;
     } catch (err) {
+      console.error('Add to cart error:', err);
       setError(err.message);
       return false;
     }
   };
 
   const removeFromCart = async (itemId) => {
+    if (!itemId) {
+      console.error('Attempted to remove item with undefined ID');
+      return false;
+    }
+
     try {
-      await api.delete(`cart/items/${itemId}/`);
+      console.log(`Attempting to remove item ${itemId} from cart`);
+      // Changed to match your Django URL pattern exactly
+      const response = await api.delete(`cart/remove/${itemId}/`);
+      console.log('Remove cart response:', response);
+
+      // Refresh cart after successful removal
       await fetchCart();
       return true;
     } catch (err) {
+      console.error('Remove from cart error:', {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        url: `cart/remove/${itemId}/` // Log the attempted URL for debugging
+      });
       setError(err.message);
       return false;
     }
@@ -52,7 +72,8 @@ export const CartProvider = ({ children }) => {
       error,
       fetchCart,
       addToCart,
-      removeFromCart
+      removeFromCart,
+      clearError: () => setError(null)
     }}>
       {children}
     </CartContext.Provider>
